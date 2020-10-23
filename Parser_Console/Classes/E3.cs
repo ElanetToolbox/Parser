@@ -3,88 +3,69 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography;
 using System.Text;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using iText.Layout.Element;
+using Parser_Console.Interfaces;
 
 namespace Parser_Console.Classes
 {
-	public class E3
+	public class E3 :IDocument
 	{
-		public string FileName { get; set; }
+		public string FilePath { get; set; }
+		public string FileType => GetType().Name;
+		public string FileName => Path.GetFileName(FilePath);
 		public string Afm { get; set; }
-		List<KeyValuePair<string, decimal?>> Values;
-		//public decimal? n102 { get; set; }
-		//public decimal? n202 { get; set; }
-		//public decimal? n181 { get; set; }
-		//public decimal? n281 { get; set; }
-		//public decimal? n481 { get; set; }
-		//public decimal? n185 { get; set; }
-		//public decimal? n285 { get; set; }
-		//public decimal? n485 { get; set; }
-		public bool error { get; set; }
-		public bool noText { get; set; }
-		public bool notE3 { get; set; }
-		public bool weirdE3 { get; set; }
+		public int Year { get; set; }
+		public string FormNumber { get; set; }
+		public string KadMain { get; set; }
+		public string KadIncome { get; set; }
+		public List<KeyValuePair<string, decimal?>> Values;
+		public bool ParsingErrorInternal { get; set; }
+		public bool ParsingErrorExternal { get; set; }
+        public DocumentCollection Collection { get; set; }
+		public bool Complete => Afm != null && Values.Count == 10 && Year == 2019 && !Values.Where(x => x.Value == null).Any();
 
-		public E3(string path)
+		public E3()
 		{
-			FileName = Path.GetFileName(path);
+		}
+
+		public void ScanE3(string path)
+		{
+			FilePath = path;
 			Values = new List<KeyValuePair<string, decimal?>>();
 			PdfReader reader = new PdfReader(path);
 			PdfDocument doc = new PdfDocument(reader);
 			string p1 = PdfTextExtractor.GetTextFromPage(doc.GetFirstPage(), new LocationTextExtractionStrategy());
-			int iCheck = p1.IndexOf("ΚΑΤΑΣΤΑΣΗ ΟΙΚΟΝΟΜΙΚΩΝ ΣΤΟΙΧΕΙΩΝ");
-			if (string.IsNullOrWhiteSpace(p1))
-			{
-				error = true;
-				noText = true;
-				return;
-			}
-			if (iCheck == -1)
-			{
-				error = true;
-				notE3 = true;
-				return;
-			}
 
 			Afm = GetAfm(p1);
+			if(Afm == null)
+			{
+				ParsingErrorInternal = true;
+				return;
+			}
+			Year = GetYear(p1, 7);
+			FormNumber = GetFormNo(p1, 10);
+			KadIncome = GetKadIncome(p1);
+			KadMain = GetKadIncome(p1);
 
 			string p2 = PdfTextExtractor.GetTextFromPage(doc.GetPage(2),new LocationTextExtractionStrategy());
-			//n102 = GetSingle(p2,9,102);
 			Values.Add(new KeyValuePair<string, decimal?>("102", GetSingle(p2,9,102)));
-			//n202 = GetBetween(p2,20,202,302);
 			Values.Add(new KeyValuePair<string, decimal?>("202", GetBetween(p2,20,202,302)));
+			Values.Add(new KeyValuePair<string, decimal?>("500", GetSingle(p2,6,500)));
+			Values.Add(new KeyValuePair<string, decimal?>("524", GetSingle(p2,56,524)));
 
 			reader = new PdfReader(path);
 			string p3 = PdfTextExtractor.GetTextFromPage(doc.GetPage(3),new LocationTextExtractionStrategy());
-			//n181 = GetBetween(p3,75, 181, 281);
 			Values.Add(new KeyValuePair<string, decimal?>("181", GetBetween(p3,75,181,281)));
-			//n281 = GetBetween(p3,75, 281, 381);
 			Values.Add(new KeyValuePair<string, decimal?>("281", GetBetween(p3,75,281,381)));
-			//n481 = GetBetween(p3,75, 481, 581);
 			Values.Add(new KeyValuePair<string, decimal?>("481", GetBetween(p3,75,481,581)));
-			//n185 = GetBetween(p3,79, 185, 285);
 			Values.Add(new KeyValuePair<string, decimal?>("185", GetBetween(p3,79,185,285)));
-			//n285 = GetBetween(p3,79, 285, 385);
 			Values.Add(new KeyValuePair<string, decimal?>("285", GetBetween(p3,79,285,385)));
-			//n485 = GetBetween(p3,79, 485, 585);
 			Values.Add(new KeyValuePair<string, decimal?>("485", GetBetween(p3,79,485,585)));
-
-			//if(n102==null && n202==null && n181==null && n281==null && n481==null && n185==null && n285==null && n485==null)
-			//{
-			//	error = true;
-			//	weirdE3 = true;
-			//}
-			if(Values.Where(x=>x.Value == null).Count() > 5)
-			{
-				error = true;
-				weirdE3 = true;
-			}
-
-			reader = new PdfReader(path);
 		}
 
 		string GetAfm(string page)
@@ -98,6 +79,32 @@ namespace Parser_Console.Classes
 			int i2No = lineText.IndexOf(" 021");
 			int length = i2No - i1No - 3;
 			string n = lineText.Substring(i1No +3, length).Replace(" ","");
+			return n;
+		}
+
+		string GetKadMain(string page)
+		{
+			string lineText = Functions.GetLine(page, 29);
+			int i1No = lineText.IndexOf("021");
+			if(i1No == -1)
+			{
+				return null;
+			}
+			int i2No = lineText.IndexOf(" 022");
+			int length = i2No - i1No - 3;
+			string n = lineText.Substring(i1No +3, length).Replace(" ","");
+			return n;
+		}
+
+		string GetKadIncome(string page)
+		{
+			string lineText = Functions.GetLine(page, 29);
+			int i1No = lineText.IndexOf("022");
+			if(i1No == -1)
+			{
+				return null;
+			}
+			string n = lineText.Substring(i1No +3).Replace(" ","");
 			return n;
 		}
 
@@ -129,7 +136,7 @@ namespace Parser_Console.Classes
 			{
 				return null;
 			}
-			int i2No = lineText.IndexOf(" "+f2No.ToString());
+			int i2No = lineText.IndexOf(" "+f2No.ToString(),i1No);
 			int length = i2No - i1No - f1No.ToString().Length;
 			string n = lineText.Substring(i1No +f1No.ToString().Length,length).Replace(" ","").Replace(".","").Replace(",",".");
 			try
@@ -142,5 +149,19 @@ namespace Parser_Console.Classes
 				return 0;
 			}
 		}
+		
+		int GetYear(string page,int line)
+		{
+			string lineText = Functions.GetLine(page, line);
+			string yearText = lineText.Replace("Φορολογικό έτος", "");
+
+			return int.Parse(yearText);
+		}
+
+		string GetFormNo(string page,int line)
+		{
+			return Functions.GetLine(page, line).Substring(3).Replace(" ","");
+		}
+
 	}
 }
