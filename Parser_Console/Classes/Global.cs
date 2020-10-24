@@ -6,7 +6,7 @@ namespace Parser_Console.Classes
 {
     public static class Global
     {
-        public static Project_Collection Project_Collection { get; set; }
+        public static Project_Collection Project_Collection;
         public static int current;
         public static string currentPath;
     }

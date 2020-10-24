@@ -6,11 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.IO.Compression;
 using System.Web;
 
 namespace Parser_Console
@@ -58,9 +58,8 @@ namespace Parser_Console
             return lines.Where(x => x.Contains(searchText)).First();
         }
 
-        public static void SaveToFile(Project_Collection projects)
+        public static void SaveToFile(Project_Collection projects,string path)
         {
-            string path = @"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΚΜΕ7\collection.fol";
             MemoryStream ms = new MemoryStream();
             using (BsonDataWriter writer = new BsonDataWriter(ms))
             {
@@ -146,18 +145,21 @@ namespace Parser_Console
             return new KeyValuePair<int, string>(-1,"");
         }
 
-        public static void UploadDocument(string Code,string path)
+        public static void UploadStream(string Code,byte[] array,string name,string folder = "")
         {
-            string name = Path.GetFileName(path);
             var client = new RestClient("https://www.elanet.gr/wp-json/covid-app/v1/projects/pdffiles/" + Code);
-            var array = File.ReadAllBytes(path);
             client.Timeout = -1;
             var request = new RestRequest(Method.PUT);
-            request.AddFile("upload",array,"test/test/"+name);
+            if (string.IsNullOrEmpty(folder))
+            {
+                request.AddFile("upload", array, name);
+            }
+            else
+            {
+                request.AddFile("upload", array, folder + "/" + name);
+            }
             request.AlwaysMultipartFormData = true;
             IRestResponse response = client.Execute(request);
-            Global.current++;
-            Console.WriteLine(response.Content +" " +Global.current.ToString());
         }
 
         public static bool IsSameDate(DateTime d1,DateTime d2)
@@ -258,11 +260,14 @@ namespace Parser_Console
         public static void UnzipFiles(string path)
         {
             var zips = Directory.GetFiles(path, "*.zip");
+            var rars = Directory.GetFiles(path, "*.rar");
+            zips = zips.Concat(rars).ToArray();
+            
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             foreach (var zip in zips)
             {
                 string zipName = Path.GetFileNameWithoutExtension(zip);
-                ZipFile.ExtractToDirectory(zip, path + @"/" + zipName,Encoding.GetEncoding(737));
+                ZipFile.ExtractToDirectory(zip, path + @"/" + zipName, Encoding.GetEncoding(737));
                 File.Delete(zip);
             }
         }
@@ -362,6 +367,24 @@ namespace Parser_Console
                 return true;
             }
             return false;
+        }
+
+        public static string GetAfmFromCode(string Code)
+        {
+            var client = new RestClient("https://www.elanet.gr/wp-json/covid-app/v1/projects/afm/" + Code);
+            client.Timeout = -1;
+            var request = new RestRequest(Method.POST);
+            request.AddHeader("Cookie", "__cfduid=d701eff1105ff2e9f0494fcc62073c6131601277950; LOhNClQmXjeGsv=eWZzKu2DNihQrV; xBowmpAyJ_=hJEAfOvB3G; wlDxodLWRmQ=%5Bqr%5DnMAdlb.");
+            IRestResponse response = client.Execute(request);
+            var result = JsonConvert.DeserializeObject<Dictionary<string,string>[]>(response.Content).First();
+            try
+            {
+                return result.Where(x=>x.Key == "TaxCode").Single().Value;
+            }
+            catch
+            {
+                return "";
+            }
         }
 
     }

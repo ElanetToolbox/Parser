@@ -14,17 +14,18 @@ namespace Parser_Console.Classes
         public string ProjectPath { get; set; }
         public DateTime LastEdit { get; set; }
         public DocumentCollection Docs { get; set; }
-        public List<Taxis> Taxis => Docs.Documents != null ? Docs.TaxisList : new List<Taxis>();
-        public List<E3> E3s =>Docs.Documents != null ?  Docs.E3s : new List<E3>();
-        public bool Complete => Taxis.Where(x=>x.DocType==0).Where(x => x.Complete).Any() && E3s.Where(x => x.Complete).Any();
-        //public int TaxisCount => Docs.TaxisList.Count;
-        //public int E3Count => Docs.E3s.Count;
-        //public int E3_2019 => Docs.E3s.Where(x => x.Year == 2019).Count();
-        //public bool Complete => CheckCompletion();
-        //public bool ValidE3 => Docs.ValidE3s.Count > 0;
-        //public bool ValidTaxis => Docs.ValidTaxisList.Count > 0;
+        public List<Taxis> TaxisCompany => Docs != null ? Docs.TaxisList.Where(x=>x.DocType == 0).ToList() : new List<Taxis>();
+        public List<Taxis> TaxisEstablishment  => Docs != null ? Docs.TaxisList.Where(x=>x.DocType == 1).ToList() : new List<Taxis>();
+        public List<E3> E3s =>Docs != null ?  Docs.E3s : new List<E3>();
+
+        public bool Complete => TaxisCompany.Where(x=>x.DocType==0).Where(x => x.Complete).Any() && E3s.Where(x => x.Complete).Any();
+        public bool CanUpload => FolderError == false && Docs.corruptDocuments.Count == 0;
+        public bool Establishments => TaxisEstablishment.Any();
 
         public bool FolderError { get; set; }
+        public bool NotPdf { get; set; }
+
+        public bool Uploaded { get; set; }
 
         public Project()
         {
@@ -57,32 +58,33 @@ namespace Parser_Console.Classes
             }
             LastEdit = Directory.GetLastWriteTime(path);
             var pdfs = Directory.GetFiles(path, "*.pdf");
+            var allFiles = Directory.GetFiles(path);
+            if(allFiles.Count() > pdfs.Count())
+            {
+                NotPdf = true;
+            }
             Docs = new DocumentCollection();
             foreach (string pdf in pdfs)
             {
-                //Functions.UploadDocument(Code, pdf);
                 Docs.AddDocument(pdf);
-                //try
-                //{
-                //    Docs.AddDocument(pdf);
-                //}
-                //catch { }
             }
         }
 
         public Upload CreateUpload()
         {
+            string Afm = Functions.GetAfmFromCode(Code);
             Upload newUpload = new Upload();
+            newUpload.Log = "";
             newUpload.ProjectFileId = Code;
             E3 correctE3 = Docs.E3s
                 .Where(x => x.Year == 2019)
                 .Where(x => !string.IsNullOrWhiteSpace(x.FormNumber))
-                .SingleOrDefault();
-            Taxis correctTaxis = Docs.TaxisList
-                .Where(x => x.DocType == 0)
-                .Where(x => DateTime.Compare(new DateTime(2018, 12, 31), x.StartDate) > 0)
-                .SingleOrDefault();
-            if(correctE3 != null)
+                .FirstOrDefault();
+            //Taxis correctTaxis = Docs.TaxisList
+            //    .Where(x => x.DocType == 0)
+            //    .Where(x => DateTime.Compare(new DateTime(2018, 12, 31), x.StartDate) > 0)
+            //    .SingleOrDefault();
+            if(correctE3 != null && correctE3.Afm == Afm)
             {
                 newUpload.f102E32019  = correctE3.Values.Where(x => x.Key == "102").Single().Value.ToString();
                 newUpload.f202E32019  = correctE3.Values.Where(x => x.Key == "202").Single().Value.ToString();
@@ -109,15 +111,42 @@ namespace Parser_Console.Classes
                 {
                     newUpload.Log += "Δέν βρέθηκε Ε3 του 2019 με αριθμό δήλωσης";
                 }
+                else if(correctE3.Afm != Afm)
+                {
+                    newUpload.Log += "Δέν βρέθηκε Ε3 με το ΑΦΜ της εταιρίας";
+                }
             }
-            if(correctTaxis != null)
-            {
-                newUpload.TaxCode = correctTaxis.Afm;
-                newUpload.LegalName = correctTaxis.CompanyName;
-                newUpload.FoundingDate = correctTaxis.StartDate.ToString("dd/MM/yyyy");
-            }
+            //if(correctTaxis != null)
+            //{
+            //    newUpload.TaxCode = correctTaxis.Afm;
+            //    newUpload.LegalName = correctTaxis.CompanyName;
+            //    newUpload.FoundingDate = correctTaxis.StartDate.ToString("dd/MM/yyyy");
+            //}
             return newUpload;
         }
-        
+
+        public void UploadProject()
+        {
+            if (!CanUpload)
+            {
+                return;
+            }
+            //foreach (var doc in Docs.Documents)
+            //{
+            //    if (doc is E3 || doc is Taxis)
+            //    {
+            //        Functions.UploadStream(Code, File.ReadAllBytes(doc.FilePath), Path.GetFileName(doc.FilePath), "parsed");
+            //    }
+            //    else
+            //    {
+            //        Functions.UploadStream(Code, File.ReadAllBytes(doc.FilePath), Path.GetFileName(doc.FilePath), "unparsed");
+            //    }
+            //}
+            Upload newUpload = CreateUpload();
+            Functions.UploadStream(Code, Encoding.UTF8.GetBytes(newUpload.Log), "report.txt");
+            newUpload.UploadToCloud(Code);
+            Uploaded = true;
+        }
+
     }
 }

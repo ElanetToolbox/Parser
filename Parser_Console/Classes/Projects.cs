@@ -27,23 +27,6 @@ namespace Parser_Console.Classes
             Projects = new List<Project>();
         }
         
-        //public void ExportInvalidReport()
-        //{
-        //    List<Project> InvalidProjects = Projects.Where(x => x.Complete == false).ToList();
-        //    string content = "";
-        //    foreach (var item in InvalidProjects)
-        //    {
-        //        content += item.ProjectPath + "\n";
-        //    }
-        //    string filePath = @"T:\ToolboxStorage\Testing\Documents\InvalidProjects.txt";
-
-        //    using (StreamWriter outputFile = new StreamWriter(filePath))
-        //    {
-        //        outputFile.WriteLine(content);
-        //    }
-
-        //}
-
         public void ScanPath(string path,List<string> existing = null)
         {
 			var folders = Directory.GetDirectories(path).ToList();
@@ -72,16 +55,6 @@ namespace Parser_Console.Classes
 
         private void ScanFolder(string folder)
         {
-            //Project existingProject = Projects.Where(x => x.ProjectPath == folder).FirstOrDefault();
-            //if (existingProject != null)
-            //{
-            //    DateTime folderDate = Directory.GetLastWriteTime(folder);
-            //    bool compareResult = Functions.IsSameDate(folderDate, existingProject.LastEdit);
-            //    if (compareResult)
-            //    {
-            //        return;
-            //    }
-            //}
             Project newProject = new Project();
             newProject.ScanPath(folder);
             Projects.Add(newProject);

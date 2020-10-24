@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using RestSharp;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -30,5 +33,24 @@ namespace Parser_Console.Classes
         public string CivicCompartment  { get; set; }
 
         public string Log { get; set; }
+
+        public string ToJsonString()
+        {
+            JObject obj = JObject.FromObject(this);
+            return obj.ToString();
+        }
+
+        public void UploadToCloud(string code)
+        {
+            var client = new RestClient("https://www.elanet.gr/wp-json/covid-app/v1/projects/data/" + code);
+            client.Timeout = -1;
+            var request = new RestRequest(Method.PUT);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddHeader("Cookie", "__cfduid=d701eff1105ff2e9f0494fcc62073c6131601277950; LOhNClQmXjeGsv=eWZzKu2DNihQrV; xBowmpAyJ_=hJEAfOvB3G; wlDxodLWRmQ=%5Bqr%5DnMAdlb.");
+            request.AddParameter("application/json", ToJsonString(), ParameterType.RequestBody);
+            IRestResponse response = client.Execute(request);
+            Console.WriteLine(response.Content);
+        }
     }
+
 }
