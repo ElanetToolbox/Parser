@@ -147,7 +147,7 @@ namespace Parser_Console
 
         public static void UploadStream(string Code,byte[] array,string name,string folder = "")
         {
-            var client = new RestClient("https://www.elanet.gr/wp-json/covid-app/v1/projects/pdffiles/" + Code);
+            var client = new RestClient("https://api.elanet.gr/wp-json/covid-app/v1/projects/pdffiles/" + Code);
             client.Timeout = -1;
             var request = new RestRequest(Method.PUT);
             if (string.IsNullOrEmpty(folder))
@@ -353,7 +353,7 @@ namespace Parser_Console
             {
                 kad = kad.Substring(0, kad.Length - 2);
             }
-            var client = new RestClient("https://www.elanet.gr/wp-json/covid-app/v1/kad/");
+            var client = new RestClient("https://api.elanet.gr/wp-json/covid-app/v1/kad/");
             client.Encoding = Encoding.UTF8;
             client.Timeout = -1;
             var request = new RestRequest(Method.POST);
@@ -371,14 +371,14 @@ namespace Parser_Console
 
         public static string GetAfmFromCode(string Code)
         {
-            var client = new RestClient("https://www.elanet.gr/wp-json/covid-app/v1/projects/afm/" + Code);
+            var client = new RestClient("https://api.elanet.gr/wp-json/covid-app/v1/projects/afm/" + Code);
             client.Timeout = -1;
             var request = new RestRequest(Method.POST);
             request.AddHeader("Cookie", "__cfduid=d701eff1105ff2e9f0494fcc62073c6131601277950; LOhNClQmXjeGsv=eWZzKu2DNihQrV; xBowmpAyJ_=hJEAfOvB3G; wlDxodLWRmQ=%5Bqr%5DnMAdlb.");
-            IRestResponse response = client.Execute(request);
-            var result = JsonConvert.DeserializeObject<Dictionary<string,string>[]>(response.Content).First();
             try
             {
+                IRestResponse response = client.Execute(request);
+                var result = JsonConvert.DeserializeObject<Dictionary<string, string>[]>(response.Content).First();
                 return result.Where(x=>x.Key == "TaxCode").Single().Value;
             }
             catch

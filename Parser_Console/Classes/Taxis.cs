@@ -33,7 +33,7 @@ namespace Parser_Console.Classes
         public bool ParsingErrorInternal { get; set; }
         public bool ParsingErrorExternal { get; set; }
         public bool NotKad { get; set; }
-        public string MainKadCode => Kads != null && Kads.Count > 0 ? Kads.Where(x => x.Type == x.Types.First()).Select(x => x.Code).First() : "";
+        //public string MainKadCode => Kads != null && Kads.Count > 0 ? Kads.Where(x => x.Type == x.Types.First()).Select(x => x.Code).First() : "";
 
         //public Project Project => GetProject();
         public bool Complete => GetCompletion();

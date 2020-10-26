@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 
 namespace Parser_Console.Classes
@@ -42,14 +43,18 @@ namespace Parser_Console.Classes
 
         public void UploadToCloud(string code)
         {
-            var client = new RestClient("https://www.elanet.gr/wp-json/covid-app/v1/projects/data/" + code);
+            var client = new RestClient("https://api.elanet.gr/wp-json/covid-app/v1/projects/data/" + code);
+            ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
             client.Timeout = -1;
             var request = new RestRequest(Method.PUT);
             request.AddHeader("Content-Type", "application/json");
             request.AddHeader("Cookie", "__cfduid=d701eff1105ff2e9f0494fcc62073c6131601277950; LOhNClQmXjeGsv=eWZzKu2DNihQrV; xBowmpAyJ_=hJEAfOvB3G; wlDxodLWRmQ=%5Bqr%5DnMAdlb.");
             request.AddParameter("application/json", ToJsonString(), ParameterType.RequestBody);
             IRestResponse response = client.Execute(request);
-            Console.WriteLine(response.Content);
+            if(response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                throw new Exception();
+            }
         }
     }
 
