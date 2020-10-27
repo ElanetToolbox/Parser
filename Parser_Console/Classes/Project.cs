@@ -91,43 +91,43 @@ namespace Parser_Console.Classes
                 .OrderByDescending(x=>x.FormNumber)
                 .FirstOrDefault();
 
-            Taxis correctTaxisCompany = Docs.TaxisList
-                .Where(x=>x.Afm == Afm)
-                .Where(x => x.DocType == 0)
-                .Where(x => x.Region == Region)
-                .Where(x => DateTime.Compare(new DateTime(2018, 12, 31), x.StartDate) > 0)
-                .SingleOrDefault();
+            //Taxis correctTaxisCompany = Docs.TaxisList
+            //    .Where(x=>x.Afm == Afm)
+            //    .Where(x => x.DocType == 0)
+            //    .Where(x => x.Region == Region)
+            //    .Where(x => DateTime.Compare(new DateTime(2018, 12, 31), x.StartDate) > 0)
+            //    .SingleOrDefault();
 
-            if (correctTaxisCompany != null && correctE3 != null)
-            {
-                foreach (var kad in DeclaredKads)
-                {
-                    if (kad == correctE3.KadMain || kad == correctE3.KadIncome)
-                    {
-                        var tKad = correctTaxisCompany.Kads.Where(x => x.Code == kad).Where(x => x.isOk).SingleOrDefault();
-                        ValidKads.Add(new Tuple<string, DateTime>(tKad.Code, tKad.DateStart));
-                    }
-                }
-            }
+            //if (correctTaxisCompany != null && correctE3 != null)
+            //{
+            //    foreach (var kad in DeclaredKads)
+            //    {
+            //        if (kad == correctE3.KadMain || kad == correctE3.KadIncome)
+            //        {
+            //            var tKad = correctTaxisCompany.Kads.Where(x => x.Code == kad).Where(x => x.isOk).SingleOrDefault();
+            //            ValidKads.Add(new Tuple<string, DateTime>(tKad.Code, tKad.DateStart));
+            //        }
+            //    }
+            //}
 
-            if (ValidKads.Any())
-            {
-                newUpload.KadEnumID = string.Join(",", ValidKads.Select(x => x.Item1).ToList());
-                newUpload.StartDate = string.Join(",", ValidKads.Select(x => x.Item2.ToString("dd/MM/yyyy")).ToList());
-            }
+            //if (ValidKads.Any())
+            //{
+            //    newUpload.KadEnumID = string.Join(",", ValidKads.Select(x => x.Item1).ToList());
+            //    newUpload.StartDate = string.Join(",", ValidKads.Select(x => x.Item2.ToString("dd/MM/yyyy")).ToList());
+            //}
 
             if (correctE3 != null && correctE3.Afm == Afm)
             {
-                newUpload.f102E32019  = correctE3.Values.Where(x => x.Key == "102").Single().Value.ToString();
-                newUpload.f202E32019  = correctE3.Values.Where(x => x.Key == "202").Single().Value.ToString();
-                newUpload.f181E32019  = correctE3.Values.Where(x => x.Key == "181").Single().Value.ToString();
-                newUpload.f281E32019  = correctE3.Values.Where(x => x.Key == "281").Single().Value.ToString();
-                newUpload.f481E32019  = correctE3.Values.Where(x => x.Key == "481").Single().Value.ToString();
-                newUpload.f185E32019  = correctE3.Values.Where(x => x.Key == "185").Single().Value.ToString();
-                newUpload.f285E32019  = correctE3.Values.Where(x => x.Key == "285").Single().Value.ToString();
-                newUpload.f485E32019  = correctE3.Values.Where(x => x.Key == "485").Single().Value.ToString();
-                newUpload.Turnover2019 = correctE3.Values.Where(x => x.Key == "500").Single().Value.ToString();
-                newUpload.EBITDA2019  = correctE3.Values.Where(x => x.Key == "524").Single().Value.ToString();
+                newUpload.f102E32019  = correctE3.Values.Where(x => x.Key == "102").Single().Value.Value.ToString("N2").Replace(",","");
+                newUpload.f202E32019  = correctE3.Values.Where(x => x.Key == "202").Single().Value.Value.ToString("N2").Replace(",","");
+                newUpload.f181E32019  = correctE3.Values.Where(x => x.Key == "181").Single().Value.Value.ToString("N2").Replace(",","");
+                newUpload.f281E32019  = correctE3.Values.Where(x => x.Key == "281").Single().Value.Value.ToString("N2").Replace(",","");
+                newUpload.f481E32019  = correctE3.Values.Where(x => x.Key == "481").Single().Value.Value.ToString("N2").Replace(",","");
+                newUpload.f185E32019  = correctE3.Values.Where(x => x.Key == "185").Single().Value.Value.ToString("N2").Replace(",","");
+                newUpload.f285E32019  = correctE3.Values.Where(x => x.Key == "285").Single().Value.Value.ToString("N2").Replace(",","");
+                newUpload.f485E32019  = correctE3.Values.Where(x => x.Key == "485").Single().Value.Value.ToString("N2").Replace(",","");
+                newUpload.Turnover2019 = correctE3.Values.Where(x => x.Key == "500").Single().Value.Value.ToString("N2").Replace(",","");
+                newUpload.EBITDA2019  = correctE3.Values.Where(x => x.Key == "524").Single().Value.Value.ToString("N2").Replace(",","");
             }
             else
             {
@@ -148,13 +148,13 @@ namespace Parser_Console.Classes
                     newUpload.Log += "Δέν βρέθηκε Ε3 με το ΑΦΜ της εταιρίας";
                 }
             }
-            if (correctTaxisCompany != null)
-            {
-                newUpload.TaxCode = correctTaxisCompany.Afm;
-                newUpload.LegalName = correctTaxisCompany.CompanyName;
-                newUpload.FoundingDate = correctTaxisCompany.StartDate.ToString("dd/MM/yyyy");
-                newUpload.PostCode = correctTaxisCompany.PostCode;
-            }
+            //if (correctTaxisCompany != null)
+            //{
+            //    newUpload.TaxCode = correctTaxisCompany.Afm;
+            //    newUpload.LegalName = correctTaxisCompany.CompanyName;
+            //    newUpload.FoundingDate = correctTaxisCompany.StartDate.ToString("dd/MM/yyyy");
+            //    newUpload.PostCode = correctTaxisCompany.PostCode;
+            //}
             return newUpload;
         }
 

@@ -42,9 +42,11 @@ namespace Parser_Console.Classes
 
         public string ToJsonString()
         {
-            JsonSerializer serializer = new JsonSerializer();
-            serializer.FloatParseHandling = FloatParseHandling.Decimal;
-            JObject obj = JObject.FromObject(this);
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.Culture = new System.Globalization.CultureInfo("us-US");
+            settings.FloatParseHandling = FloatParseHandling.Decimal;
+            var obj = JsonConvert.SerializeObject(this, Formatting.Indented, settings);
+            //JObject obj = JObject.FromObject(this,serializer);
             return obj.ToString();
         }
 

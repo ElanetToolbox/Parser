@@ -376,7 +376,7 @@ namespace Parser_Console
 
         public static ValidationInfo GetAfmFromCode(string Code)
         {
-            var client = new RestClient("https://api.elanet.gr/wp-json/covid-app/v1/projects/afm/" + Code);
+            var client = new RestClient("https://api.elanet.gr/wp-json/covid-app/v1/projects/info/" + Code);
             client.Timeout = -1;
             var request = new RestRequest(Method.POST);
             request.AddHeader("Cookie", "__cfduid=d701eff1105ff2e9f0494fcc62073c6131601277950; LOhNClQmXjeGsv=eWZzKu2DNihQrV; xBowmpAyJ_=hJEAfOvB3G; wlDxodLWRmQ=%5Bqr%5DnMAdlb.");
@@ -405,8 +405,24 @@ namespace Parser_Console
 
         public static void UploadFileSCP()
         {
-            PrivateKeyFile[] privateKeyFile = { new PrivateKeyFile(@"C:\Users\chatziparadeisis.i\Documents\covid\test.ppk") };
-            AuthenticationMethod[] method = { 
+            string command = @"gcloud compute scp C:\Users\chatziparadeisis.i\Documents\covid\test.zip bitnami@api-vm:/opt/bitnami/apps/covidpdf/production/KME7-0088816";
+            var proc1 = new ProcessStartInfo();
+            string anyCommand;
+            proc1.UseShellExecute = true;
+
+            proc1.WorkingDirectory = @"C:\Windows\System32";
+
+            proc1.FileName = @"C:\Windows\System32\cmd.exe";
+            proc1.Verb = "runas";
+            proc1.Arguments = "/c " + command;
+            proc1.WindowStyle = ProcessWindowStyle.Normal;
+            Process.Start(proc1);
+        }
+
+        public static void UploadFileSCP2()
+        {
+            PrivateKeyFile[] privateKeyFile = { new PrivateKeyFile(@"C:\Users\chatziparadeisis.i\Documents\covid\test3") };
+            AuthenticationMethod[] method = {
                 new PasswordAuthenticationMethod("bitnami","R9ifSAgHXALu"),
                 new PrivateKeyAuthenticationMethod("bitnami", privateKeyFile),
             };
