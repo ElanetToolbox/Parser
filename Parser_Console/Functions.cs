@@ -1,13 +1,18 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using Parser_Console.Classes;
+using Renci.SshNet;
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Management.Automation;
+using System.Management.Automation.Runspaces;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -369,7 +374,7 @@ namespace Parser_Console
             return false;
         }
 
-        public static string GetAfmFromCode(string Code)
+        public static ValidationInfo GetAfmFromCode(string Code)
         {
             var client = new RestClient("https://api.elanet.gr/wp-json/covid-app/v1/projects/afm/" + Code);
             client.Timeout = -1;
@@ -379,13 +384,40 @@ namespace Parser_Console
             {
                 IRestResponse response = client.Execute(request);
                 var result = JsonConvert.DeserializeObject<Dictionary<string, string>[]>(response.Content).First();
-                return result.Where(x=>x.Key == "TaxCode").Single().Value;
+                ValidationInfo vInfo = new ValidationInfo();
+                vInfo.Afm = result.Where(x=>x.Key == "TaxCode").Single().Value;
+                vInfo.Kad = result.Where(x=>x.Key == "KadPool").Single().Value.Split(",").ToList();
+                return vInfo;
             }
             catch
             {
-                return "";
+                return null;
             }
         }
+
+        public static string GetPostCodeFromAddress(string address)
+        {
+            Regex r = new Regex(RegexPatterns.PostCode);
+            Match m = r.Match(address);
+            string result = m.Value.Replace("ΤΚ:","").Trim();
+            return result;
+        }
+
+        public static void UploadFileSCP()
+        {
+            PrivateKeyFile[] privateKeyFile = { new PrivateKeyFile(@"C:\Users\chatziparadeisis.i\Documents\covid\test.ppk") };
+            AuthenticationMethod[] method = { 
+                new PasswordAuthenticationMethod("bitnami","R9ifSAgHXALu"),
+                new PrivateKeyAuthenticationMethod("bitnami", privateKeyFile),
+            };
+            ConnectionInfo info = new ConnectionInfo("14.86.159.161", 22, "bitnami",method);
+            using(var client = new SshClient(info))
+            {
+                client.Connect();
+            }
+        }
+
+
 
     }
 }

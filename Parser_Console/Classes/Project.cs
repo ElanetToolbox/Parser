@@ -14,9 +14,13 @@ namespace Parser_Console.Classes
         public string ProjectPath { get; set; }
         public DateTime LastEdit { get; set; }
         public DocumentCollection Docs { get; set; }
+        public List<Taxis> Taxis => Docs != null ? Docs.TaxisList.ToList() : new List<Taxis>();
         public List<Taxis> TaxisCompany => Docs != null ? Docs.TaxisList.Where(x=>x.DocType == 0).ToList() : new List<Taxis>();
         public List<Taxis> TaxisEstablishment  => Docs != null ? Docs.TaxisList.Where(x=>x.DocType == 1).ToList() : new List<Taxis>();
         public List<E3> E3s =>Docs != null ?  Docs.E3s : new List<E3>();
+
+        public bool DoubleE3 => E3s.Where(x => x.Complete).Count() > 1;
+        public bool DoubleTaxis => Taxis.Where(x=>x.Complete).Where(x => x.CompanyOk).Count() > 1;
 
         public bool Complete => TaxisCompany.Where(x=>x.DocType==0).Where(x => x.Complete).Any() && E3s.Where(x => x.Complete).Any();
         public bool CanUpload => FolderError == false && Docs.corruptDocuments.Count == 0;
@@ -72,19 +76,47 @@ namespace Parser_Console.Classes
 
         public Upload CreateUpload()
         {
-            string Afm = Functions.GetAfmFromCode(Code);
+            ValidationInfo vInfo = Functions.GetAfmFromCode(Code);
+            string Afm = vInfo.Afm;
+            List<string> DeclaredKads = vInfo.KadFormatted;
+            List<Tuple<string, DateTime>> ValidKads = new List<Tuple<string, DateTime>>();
+
             Upload newUpload = new Upload();
             newUpload.Log = "";
             newUpload.ProjectFileId = Code;
+
             E3 correctE3 = Docs.E3s
                 .Where(x => x.Year == 2019)
                 .Where(x => !string.IsNullOrWhiteSpace(x.FormNumber))
+                .OrderByDescending(x=>x.FormNumber)
                 .FirstOrDefault();
-            //Taxis correctTaxis = Docs.TaxisList
-            //    .Where(x => x.DocType == 0)
-            //    .Where(x => DateTime.Compare(new DateTime(2018, 12, 31), x.StartDate) > 0)
-            //    .SingleOrDefault();
-            if(correctE3 != null && correctE3.Afm == Afm)
+
+            Taxis correctTaxisCompany = Docs.TaxisList
+                .Where(x=>x.Afm == Afm)
+                .Where(x => x.DocType == 0)
+                .Where(x => x.Region == Region)
+                .Where(x => DateTime.Compare(new DateTime(2018, 12, 31), x.StartDate) > 0)
+                .SingleOrDefault();
+
+            if (correctTaxisCompany != null && correctE3 != null)
+            {
+                foreach (var kad in DeclaredKads)
+                {
+                    if (kad == correctE3.KadMain || kad == correctE3.KadIncome)
+                    {
+                        var tKad = correctTaxisCompany.Kads.Where(x => x.Code == kad).Where(x => x.isOk).SingleOrDefault();
+                        ValidKads.Add(new Tuple<string, DateTime>(tKad.Code, tKad.DateStart));
+                    }
+                }
+            }
+
+            if (ValidKads.Any())
+            {
+                newUpload.KadEnumID = string.Join(",", ValidKads.Select(x => x.Item1).ToList());
+                newUpload.StartDate = string.Join(",", ValidKads.Select(x => x.Item2.ToString("dd/MM/yyyy")).ToList());
+            }
+
+            if (correctE3 != null && correctE3.Afm == Afm)
             {
                 newUpload.f102E32019  = correctE3.Values.Where(x => x.Key == "102").Single().Value.ToString();
                 newUpload.f202E32019  = correctE3.Values.Where(x => x.Key == "202").Single().Value.ToString();
@@ -116,12 +148,13 @@ namespace Parser_Console.Classes
                     newUpload.Log += "Δέν βρέθηκε Ε3 με το ΑΦΜ της εταιρίας";
                 }
             }
-            //if(correctTaxis != null)
-            //{
-            //    newUpload.TaxCode = correctTaxis.Afm;
-            //    newUpload.LegalName = correctTaxis.CompanyName;
-            //    newUpload.FoundingDate = correctTaxis.StartDate.ToString("dd/MM/yyyy");
-            //}
+            if (correctTaxisCompany != null)
+            {
+                newUpload.TaxCode = correctTaxisCompany.Afm;
+                newUpload.LegalName = correctTaxisCompany.CompanyName;
+                newUpload.FoundingDate = correctTaxisCompany.StartDate.ToString("dd/MM/yyyy");
+                newUpload.PostCode = correctTaxisCompany.PostCode;
+            }
             return newUpload;
         }
 

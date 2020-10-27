@@ -15,6 +15,8 @@ namespace Parser_Console.Classes
         public List<E3> E3s => Docs != null ? Docs.Where(x => x is E3).Select(x => (E3)x).ToList() : new List<E3>();
         public List<CorruptDocument> corruptDocuments => Docs != null ? Docs.Where(x => x is CorruptDocument).Select(x => (CorruptDocument)x).ToList() : new List<CorruptDocument>();
         public List<Taxis> Taxis => Docs != null ? Docs.Where(x => x is Taxis).Select(x => (Taxis)x).ToList() : new List<Taxis>();
+        public List<Taxis> TaxisCompany => Docs != null ? Taxis.Where(x=>x.DocType==0).ToList() : new List<Taxis>();
+        public List<Taxis> TaxisEst => Docs != null ? Taxis.Where(x=>x.DocType==1).ToList() : new List<Taxis>();
         public List<E3> ErrorE3s => E3s.Where(x => x.ParsingErrorExternal).ToList();
         public List<Taxis> ErrorTaxis => Taxis.Where(x => x.ParsingErrorExternal).ToList();
         public List<E3> CompleteE3s => E3s.Where(x => x.Complete).ToList();

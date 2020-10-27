@@ -21,6 +21,7 @@ namespace Parser_Console.Classes
         public static string KadHeader = @"Κωδικός.*?∆ραστηριότητα.*?Είδος.*?Ημ/νία.*?έναρξης.*?Ημ/νία.*?διακοπής";
         public static string EstablishmentHeader = @"Αριθμός.*Είδος.*Τίτλος.*∆ιεύθυνση.";
         public static string EstablishmentEnd = @"Αναλυτικά Στοιχεία";
+        public static string PostCode = @"ΤΚ: {1}\d{5}";
 
     }
 }

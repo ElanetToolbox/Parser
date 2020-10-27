@@ -14,6 +14,9 @@ namespace Parser_Console.Classes
         public DateTime DateStart { get; set; }
         public DateTime? DateEnd { get; set; }
         public List<string> Types => new List<string> { "Κύρια", "∆ευτερεύουσα", "Λοιπή","Βοηθητική"};
+        public bool isActive => DateEnd == null;
+        public bool isEligible => DateTime.Compare(DateStart, new DateTime(31, 1, 2020)) < 0;
+        public bool isOk => isActive && isEligible;
 
         public Kad()
         {

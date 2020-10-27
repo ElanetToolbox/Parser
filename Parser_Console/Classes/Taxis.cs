@@ -26,6 +26,7 @@ namespace Parser_Console.Classes
         public string Fpa { get; set; }
         public string FpaStatus { get; set; }
         public List<Kad> Kads { get; set; }
+        public List<Kad> CorrectKads => Kads.Where(x => x.isOk).ToList();
         public List<Establishment> Establishments { get; set; }
         public int PrintType { get; set; }
         public int DocType { get; set; }
@@ -33,10 +34,12 @@ namespace Parser_Console.Classes
         public bool ParsingErrorInternal { get; set; }
         public bool ParsingErrorExternal { get; set; }
         public bool NotKad { get; set; }
-        //public string MainKadCode => Kads != null && Kads.Count > 0 ? Kads.Where(x => x.Type == x.Types.First()).Select(x => x.Code).First() : "";
 
-        //public Project Project => GetProject();
+        public string PostCode => !string.IsNullOrWhiteSpace(Address) ? Functions.GetPostCodeFromAddress(Address) : "";
+        public string Region => !string.IsNullOrWhiteSpace(Address) ? Functions.GetRegionByPostCode(PostCode) : "";
+
         public bool Complete => GetCompletion();
+        public bool CompanyOk => DocType == 0 && DateTime.Compare(new DateTime(2018, 12, 31), StartDate) > 0;
 
         private Project GetProject()
         {

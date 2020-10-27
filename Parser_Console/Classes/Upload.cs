@@ -32,11 +32,18 @@ namespace Parser_Console.Classes
         public string TaxOffice { get; set; }
         public string CountryOfResidence { get; set; }
         public string CivicCompartment  { get; set; }
+        public string PostCode { get; set; }
+
+        //Combined
+        public string KadEnumID { get; set; }
+        public string StartDate { get; set; }
 
         public string Log { get; set; }
 
         public string ToJsonString()
         {
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.FloatParseHandling = FloatParseHandling.Decimal;
             JObject obj = JObject.FromObject(this);
             return obj.ToString();
         }
