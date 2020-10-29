@@ -16,24 +16,30 @@ namespace Parser_Console
 	{
 		static void Main(string[] args)
 		{
+			//Functions.UnRar(@"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΚΜΕ7\ΚΜΕ7-0079795 - Copy\ΣΥΝΝΗΜΕΝΑ__11127541.rar",@"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΚΜΕ7\ΚΜΕ7-0079795 - Copy");
 			//Functions.UploadFileSCP();
 			//Functions.UploadStream("ΚΜΕ7-0079786", File.ReadAllBytes(@"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΚΜΕ7\test.zip"), "test.zip");
 
 			//Project_Collection projects = new Project_Collection();
+			//Project_Collection projects = Functions.LoadFromFile(@"C:\Users\chatziparadeisis.i\Documents\covid\athens.fol");
 			Project_Collection projects = Functions.LoadFromFile(@"C:\Users\chatziparadeisis.i\Documents\covid\collection.fol");
-			//p.ForEach(x => x.UploadProject());
-			//DateTime start = DateTime.Now;
+			projects.Projects.ForEach(x => x.Uploaded = false);
+			//projects.ScanPath(@"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΑΤΤΕ3-ΒΑΡΕ6-ΝΑΙΕ2");
+			//var p = projects.Projects.Where(x => x.Uploaded).ToList();
+			var p2 = projects.Projects.Where(x => !x.Uploaded).Where(x => x.CanUpload).ToList();
 			//projects.Projects.ForEach(x => x.UploadProject());
-			Parallel.ForEach(projects.Projects, project =>
-			{
-				try
-				{
-					project.UploadProject();
-				}
-				catch
-				{
-				}
-			});
+			//DateTime start = DateTime.Now;
+			p2.ForEach(x => x.UploadProject());
+			//Parallel.ForEach(p2, project =>
+			//{
+			//	try
+			//	{
+			//		project.UploadProject();
+			//	}
+			//	catch
+			//	{
+			//	}
+			//});
 			//DateTime end = DateTime.Now;
 			//TimeSpan totalTime = end - start;
 			//int x = projects.Projects.Where(x => x.Uploaded).Count();

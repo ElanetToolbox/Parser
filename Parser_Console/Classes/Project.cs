@@ -12,7 +12,6 @@ namespace Parser_Console.Classes
         public string Prefix => Code.Substring(0, Code.IndexOf("-"));
         public string Region => Functions.GetRegionByPrefix(Prefix);
         public string ProjectPath { get; set; }
-        public DateTime LastEdit { get; set; }
         public DocumentCollection Docs { get; set; }
         public List<Taxis> Taxis => Docs != null ? Docs.TaxisList.ToList() : new List<Taxis>();
         public List<Taxis> TaxisCompany => Docs != null ? Docs.TaxisList.Where(x=>x.DocType == 0).ToList() : new List<Taxis>();
@@ -51,22 +50,14 @@ namespace Parser_Console.Classes
         {
             ProjectPath = path;
 			Code = Path.GetFileName(path);
-            try
-            {
-                Functions.FixFolder(path);
-            }
-            catch 
-            { 
-                FolderError = true;
-                return;
-            }
-            LastEdit = Directory.GetLastWriteTime(path);
-            var pdfs = Directory.GetFiles(path, "*.pdf");
-            var allFiles = Directory.GetFiles(path);
-            if(allFiles.Count() > pdfs.Count())
-            {
-                NotPdf = true;
-            }
+
+            string zipPath = Functions.CompressFolder(path);
+            Functions.UploadFileSCP(Code,Path.GetDirectoryName(zipPath));
+            Directory.Delete(Path.GetDirectoryName(zipPath),true);
+
+            Functions.ExtractFiles(path);
+
+            var pdfs = Directory.GetFiles(path, "*.pdf",SearchOption.AllDirectories);
             Docs = new DocumentCollection();
             foreach (string pdf in pdfs)
             {
@@ -91,30 +82,12 @@ namespace Parser_Console.Classes
                 .OrderByDescending(x=>x.FormNumber)
                 .FirstOrDefault();
 
-            //Taxis correctTaxisCompany = Docs.TaxisList
-            //    .Where(x=>x.Afm == Afm)
-            //    .Where(x => x.DocType == 0)
-            //    .Where(x => x.Region == Region)
-            //    .Where(x => DateTime.Compare(new DateTime(2018, 12, 31), x.StartDate) > 0)
-            //    .SingleOrDefault();
-
-            //if (correctTaxisCompany != null && correctE3 != null)
-            //{
-            //    foreach (var kad in DeclaredKads)
-            //    {
-            //        if (kad == correctE3.KadMain || kad == correctE3.KadIncome)
-            //        {
-            //            var tKad = correctTaxisCompany.Kads.Where(x => x.Code == kad).Where(x => x.isOk).SingleOrDefault();
-            //            ValidKads.Add(new Tuple<string, DateTime>(tKad.Code, tKad.DateStart));
-            //        }
-            //    }
-            //}
-
-            //if (ValidKads.Any())
-            //{
-            //    newUpload.KadEnumID = string.Join(",", ValidKads.Select(x => x.Item1).ToList());
-            //    newUpload.StartDate = string.Join(",", ValidKads.Select(x => x.Item2.ToString("dd/MM/yyyy")).ToList());
-            //}
+            Taxis correctTaxisCompany = Docs.TaxisList
+                .Where(x => x.Afm == Afm)
+                .Where(x => x.DocType == 0)
+                .Where(x => x.Region == Region)
+                .Where(x => DateTime.Compare(new DateTime(2018, 12, 31), x.StartDate) > 0)
+                .SingleOrDefault();
 
             if (correctE3 != null && correctE3.Afm == Afm)
             {
@@ -128,6 +101,8 @@ namespace Parser_Console.Classes
                 newUpload.f485E32019  = correctE3.Values.Where(x => x.Key == "485").Single().Value.Value.ToString("N2").Replace(",","");
                 newUpload.Turnover2019 = correctE3.Values.Where(x => x.Key == "500").Single().Value.Value.ToString("N2").Replace(",","");
                 newUpload.EBITDA2019  = correctE3.Values.Where(x => x.Key == "524").Single().Value.Value.ToString("N2").Replace(",","");
+                newUpload.KadSuggestBiggest = Functions.Kadify(correctE3.KadIncome);
+                newUpload.KadSuggestMain =Functions.Kadify(correctE3.KadMain);
             }
             else
             {
@@ -148,13 +123,37 @@ namespace Parser_Console.Classes
                     newUpload.Log += "Δέν βρέθηκε Ε3 με το ΑΦΜ της εταιρίας";
                 }
             }
-            //if (correctTaxisCompany != null)
-            //{
-            //    newUpload.TaxCode = correctTaxisCompany.Afm;
-            //    newUpload.LegalName = correctTaxisCompany.CompanyName;
-            //    newUpload.FoundingDate = correctTaxisCompany.StartDate.ToString("dd/MM/yyyy");
-            //    newUpload.PostCode = correctTaxisCompany.PostCode;
-            //}
+
+            if (correctTaxisCompany != null)
+            {
+                newUpload.TaxCode = correctTaxisCompany.Afm;
+                newUpload.LegalName = correctTaxisCompany.CompanyName;
+                newUpload.FoundingDate = correctTaxisCompany.StartDate.ToString("dd/MM/yyyy");
+                newUpload.PostCode = correctTaxisCompany.PostCode;
+                if(correctE3 != null)
+                {
+                    newUpload.KadSuggestBiggestDate = correctTaxisCompany.Kads.Where(x=>x.Code == correctE3.KadIncome && x.DateEnd == null).Single().DateStart.ToString("dd/MM/yyyy");
+                    newUpload.KadSuggestMainDate = correctTaxisCompany.Kads.Where(x=>x.Code == correctE3.KadMain && x.DateEnd == null).Single().DateStart.ToString("dd/MM/yyyy");
+                }
+            }
+
+            if(TaxisEstablishment.Count > 0)
+            {
+                newUpload.KadImplementationCodes = new List<string>();
+                newUpload.KadImplementationDates = new List<string>();
+                newUpload.KadImplementationPostCodes = new List<string>();
+                foreach (var est in TaxisEstablishment)
+                {
+                    foreach (var kad in est.Kads)
+                    {
+                        newUpload.KadImplementationCodes.Add(Functions.Kadify(kad.Code));
+                        newUpload.KadImplementationDates.Add(kad.DateStart.ToString("dd/MM/yyyy"));
+                        newUpload.KadImplementationPostCodes.Add(est.PostCode);
+                    }
+
+                }
+                string test = newUpload.CreateKadImplementationPlaces();
+            }
             return newUpload;
         }
 
@@ -164,20 +163,9 @@ namespace Parser_Console.Classes
             {
                 return;
             }
-            //foreach (var doc in Docs.Documents)
-            //{
-            //    if (doc is E3 || doc is Taxis)
-            //    {
-            //        Functions.UploadStream(Code, File.ReadAllBytes(doc.FilePath), Path.GetFileName(doc.FilePath), "parsed");
-            //    }
-            //    else
-            //    {
-            //        Functions.UploadStream(Code, File.ReadAllBytes(doc.FilePath), Path.GetFileName(doc.FilePath), "unparsed");
-            //    }
-            //}
             Upload newUpload = CreateUpload();
-            Functions.UploadStream(Code, Encoding.UTF8.GetBytes(newUpload.Log), "report.txt");
-            newUpload.UploadToCloud(Code);
+            //Functions.UploadStream(Code, Encoding.UTF8.GetBytes(newUpload.Log), "report.txt");
+            //newUpload.UploadToCloud(Code);
             Uploaded = true;
         }
 

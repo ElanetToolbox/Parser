@@ -29,30 +29,38 @@ namespace Parser_Console.Classes
             Projects = new List<Project>();
         }
         
-        public void ScanPath(string path,List<string> existing = null)
+        public void ScanPath(string path,bool serial = false)
         {
 			var folders = Directory.GetDirectories(path).ToList();
-            if(existing != null)
-            {
-                folders = folders.Except(existing).Take(2000).ToList();
-            }
+            IEnumerable<string> existing = Projects.Select(x => x.ProjectPath);
+            folders = folders.Except(existing).Take(100).ToList();
 			DateTime start = DateTime.Now;
-            Global.current = 0;
 
-            //foreach (var folder in folders)
-            //{
-            //    ScanFolder(folder);
-            //    string cd = Path.GetFileName(folder);
-            //    Global.current++;
-            //    Console.WriteLine(Global.current.ToString() + "-->" + cd);
-            //}
-
-            Parallel.ForEach(folders, folder =>
+            if (serial)
             {
-                ScanFolder(folder);
-            });
+
+                foreach (var folder in folders)
+                {
+                    ScanFolder(folder);
+                    string cd = Path.GetFileName(folder);
+                    Global.current++;
+                    Console.WriteLine(Global.current.ToString() + "-->" + cd);
+                }
+            }
+            else
+            {
+                Parallel.ForEach(folders, folder =>
+                {
+                    ScanFolder(folder);
+                });
+            }
+
             DateTime end = DateTime.Now;
 			TimeSpan totalTime = end - start;
+            Console.WriteLine(totalTime);
+            string[] s = Global.exitCodes;
+
+            Functions.SaveToFile(this,@"C:\Users\chatziparadeisis.i\Documents\covid\athens.fol");
         }
 
         private void ScanFolder(string folder)
@@ -60,7 +68,6 @@ namespace Parser_Console.Classes
             Project newProject = new Project();
             newProject.ScanPath(folder);
             Projects.Add(newProject);
-            //Functions.SaveToFile(this);
         }
     }
 }

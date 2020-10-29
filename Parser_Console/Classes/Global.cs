@@ -9,6 +9,7 @@ namespace Parser_Console.Classes
         public static Project_Collection Project_Collection;
         public static int current;
         public static string currentPath;
+        public static string[] exitCodes;
     }
 
     public static class RegexPatterns

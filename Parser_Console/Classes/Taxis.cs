@@ -26,7 +26,7 @@ namespace Parser_Console.Classes
         public string Fpa { get; set; }
         public string FpaStatus { get; set; }
         public List<Kad> Kads { get; set; }
-        public List<Kad> CorrectKads => Kads.Where(x => x.isOk).ToList();
+        public List<Kad> CorrectKads => Kads != null ? Kads.Where(x => x.isOk).ToList() : null;
         public List<Establishment> Establishments { get; set; }
         public int PrintType { get; set; }
         public int DocType { get; set; }

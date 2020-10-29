@@ -23,6 +23,10 @@ namespace Parser_Console.Classes
         public string f485E32019  { get; set; } //485
         public string Turnover2019 { get; set; } //500
         public string EBITDA2019  { get; set; } //524
+        public string KadSuggestBiggest  { get; set; } //kyrios kad
+        public string KadSuggestBiggestDate  { get; set; } //kyrios kad
+        public string KadSuggestMain  { get; set; } //kad megalitera esoda
+        public string KadSuggestMainDate  { get; set; } //kad megalitera esoda
 
         //Taxis
         public string TaxCode { get; set; }
@@ -33,21 +37,34 @@ namespace Parser_Console.Classes
         public string CountryOfResidence { get; set; }
         public string CivicCompartment  { get; set; }
         public string PostCode { get; set; }
+        public string KadImplementationPlaces { get; set; }
 
-        //Combined
-        public string KadEnumID { get; set; }
-        public string StartDate { get; set; }
+        public List<string> KadImplementationCodes { get; set; }
+        public List<string> KadImplementationDates { get; set; }
+        public List<string> KadImplementationPostCodes { get; set; }
 
         public string Log { get; set; }
 
         public string ToJsonString()
         {
+            KadImplementationPlaces = CreateKadImplementationPlaces();
             JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.Culture = new System.Globalization.CultureInfo("us-US");
-            settings.FloatParseHandling = FloatParseHandling.Decimal;
             var obj = JsonConvert.SerializeObject(this, Formatting.Indented, settings);
             //JObject obj = JObject.FromObject(this,serializer);
             return obj.ToString();
+        }
+
+        public string CreateKadImplementationPlaces()
+        {
+            if (KadImplementationCodes != null && KadImplementationCodes.Count > 0)
+            {
+                string result = "";
+                result += JsonConvert.SerializeObject(KadImplementationCodes.ToArray()) + ",";
+                result += JsonConvert.SerializeObject(KadImplementationDates.ToArray()) + ",";
+                result += JsonConvert.SerializeObject(KadImplementationPostCodes.ToArray()) ;
+                return result;
+            }
+            return "";
         }
 
         public void UploadToCloud(string code)
@@ -58,7 +75,8 @@ namespace Parser_Console.Classes
             var request = new RestRequest(Method.PUT);
             request.AddHeader("Content-Type", "application/json");
             request.AddHeader("Cookie", "__cfduid=d701eff1105ff2e9f0494fcc62073c6131601277950; LOhNClQmXjeGsv=eWZzKu2DNihQrV; xBowmpAyJ_=hJEAfOvB3G; wlDxodLWRmQ=%5Bqr%5DnMAdlb.");
-            request.AddParameter("application/json", ToJsonString(), ParameterType.RequestBody);
+            string json = ToJsonString();
+            request.AddParameter("application/json", json, ParameterType.RequestBody);
             IRestResponse response = client.Execute(request);
             if(response.StatusCode != System.Net.HttpStatusCode.OK)
             {

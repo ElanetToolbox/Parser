@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using Parser_Console.Classes;
-using Renci.SshNet;
 using RestSharp;
+using SharpCompress.Archives.Rar;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -196,73 +196,7 @@ namespace Parser_Console
             return false;
         }
 
-        public static void MakeFolderShallow(string folderPath)
-        {
-            string currentfolder = folderPath;
-            int i;
-            bool moved;
-            var mainFolderDirectories = Directory.GetDirectories(currentfolder);
-            while (mainFolderDirectories.Count() > 0)
-            {
-                foreach (var dir in mainFolderDirectories)
-                {
-                    var childFolderDirectories = Directory.GetDirectories(dir);
-                    var childFolderFiles = Directory.GetFiles(dir);
-                    foreach (var f in childFolderFiles)
-                    {
-                        moved = false;
-                        string fileNameOriginal = Path.GetFileName(f);
-                        string fileNameCurrent = fileNameOriginal;
-                        i = 1;
-                        do
-                        {
-                            try
-                            {
-                                File.Move(f, Path.Combine(currentfolder, fileNameCurrent));
-                                moved = true;
-                            }
-                            catch
-                            {
-                                string xt = Path.GetExtension(fileNameCurrent);
-                                string name = Path.GetFileNameWithoutExtension(fileNameCurrent);
-                                fileNameCurrent = name + " - " + i.ToString() + xt;
-                            }
-
-                        } while (!moved);
-                    }
-                    foreach (var d in childFolderDirectories)
-                    {
-                        moved = false;
-                        string dirNameOriginal = Path.GetFileName(d);
-                        string dirNameCurrent = dirNameOriginal;
-                        i = 1;
-                        do
-                        {
-                            if (i == 1000)
-                            {
-                                throw new Exception();
-                            }
-                            try
-                            {
-                                Directory.Move(d,currentfolder+@"\"+dirNameCurrent);
-                                moved = true;
-                            }
-                            catch(Exception ex)
-                            {
-                                dirNameCurrent = dirNameOriginal + " - " + i.ToString();
-                                i++;
-                            }
-
-                        } while (!moved);
-                    }
-                    Directory.Delete(dir);
-                }
-                mainFolderDirectories = Directory.GetDirectories(currentfolder);
-
-            }
-        }
-
-        public static void UnzipFiles(string path)
+        public static void UnzipFiles2(string path)
         {
             var zips = Directory.GetFiles(path, "*.zip");
             var rars = Directory.GetFiles(path, "*.rar");
@@ -277,16 +211,58 @@ namespace Parser_Console
             }
         }
 
-        public static void FixFolder(string path)
+        public static void ExtractFiles(string path)
         {
-            MakeFolderShallow(path);
             var zips = Directory.GetFiles(path, "*.zip");
-            while (zips.Count() > 0)
+            var rars = Directory.GetFiles(path, "*.rar");
+            UnZip(path, zips);
+            UnRarArray(path, rars);
+        }
+
+        private static void UnZip(string path, string[] zips)
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            foreach (var zip in zips)
             {
-                UnzipFiles(path);
-                MakeFolderShallow(path);
-                zips = Directory.GetFiles(path, "*.zip");
+                string zipName = Path.GetFileNameWithoutExtension(zip);
+                try
+                {
+                    ZipFile.ExtractToDirectory(zip, path + @"/" + zipName, Encoding.GetEncoding(737));
+                }
+                catch { }
             }
+        }
+
+        private static void UnRarArray(string path,string[] rars)
+        {
+            foreach (var rar in rars)
+            {
+                UnRar(rar, path);
+            }
+        }
+
+        public static void UnRar(string source,string destinationFolder)
+        {
+            string rarName = Path.GetFileNameWithoutExtension(source);
+            destinationFolder = destinationFolder + @"\" + rarName;
+            if (Directory.Exists(destinationFolder))
+            {
+                Directory.Delete(destinationFolder, true);
+            }
+            string arguments = string.Format(@"x -s ""{0}"" *.* ""{1}\""", source, destinationFolder);
+            Process.Start(@"C:\Program Files\WinRAR\UnRAR.exe", arguments);
+        }
+
+        public static string CompressFolder(string path)
+        {
+            Directory.CreateDirectory(@"C:\Users\chatziparadeisis.i\Documents\covid\tmp\" + Path.GetFileName(path));
+            string zipFile = @"C:\Users\chatziparadeisis.i\Documents\covid\tmp\" + Path.GetFileName(path) + @"\documents.zip";
+            if (File.Exists(zipFile))
+            {
+                File.Delete(zipFile);
+            }
+            ZipFile.CreateFromDirectory(path, zipFile);
+            return zipFile;
         }
 
         public static string GetRegionByPrefix(string prefix)
@@ -376,7 +352,7 @@ namespace Parser_Console
 
         public static ValidationInfo GetAfmFromCode(string Code)
         {
-            var client = new RestClient("https://api.elanet.gr/wp-json/covid-app/v1/projects/info/" + Code);
+            var client = new RestClient("https://api.elanet.gr/wp-json/covid-app/v1/projects/info/" + Greekify(Code));
             client.Timeout = -1;
             var request = new RestRequest(Method.POST);
             request.AddHeader("Cookie", "__cfduid=d701eff1105ff2e9f0494fcc62073c6131601277950; LOhNClQmXjeGsv=eWZzKu2DNihQrV; xBowmpAyJ_=hJEAfOvB3G; wlDxodLWRmQ=%5Bqr%5DnMAdlb.");
@@ -403,11 +379,10 @@ namespace Parser_Console
             return result;
         }
 
-        public static void UploadFileSCP()
+        public static void UploadFileSCP(string Code,string path)
         {
-            string command = @"gcloud compute scp C:\Users\chatziparadeisis.i\Documents\covid\test.zip bitnami@api-vm:/opt/bitnami/apps/covidpdf/production/KME7-0088816";
+            string command = @"gcloud compute scp --recurse " + path + @" bitnami@api-vm:/opt/bitnami/apps/covidpdf/staging";
             var proc1 = new ProcessStartInfo();
-            string anyCommand;
             proc1.UseShellExecute = true;
 
             proc1.WorkingDirectory = @"C:\Windows\System32";
@@ -415,25 +390,36 @@ namespace Parser_Console
             proc1.FileName = @"C:\Windows\System32\cmd.exe";
             proc1.Verb = "runas";
             proc1.Arguments = "/c " + command;
-            proc1.WindowStyle = ProcessWindowStyle.Normal;
-            Process.Start(proc1);
+            proc1.WindowStyle = ProcessWindowStyle.Hidden;
+            Process.Start(proc1).WaitForExit();
         }
 
-        public static void UploadFileSCP2()
+        public static string Greekify(string str)
         {
-            PrivateKeyFile[] privateKeyFile = { new PrivateKeyFile(@"C:\Users\chatziparadeisis.i\Documents\covid\test3") };
-            AuthenticationMethod[] method = {
-                new PasswordAuthenticationMethod("bitnami","R9ifSAgHXALu"),
-                new PrivateKeyAuthenticationMethod("bitnami", privateKeyFile),
-            };
-            ConnectionInfo info = new ConnectionInfo("14.86.159.161", 22, "bitnami",method);
-            using(var client = new SshClient(info))
-            {
-                client.Connect();
-            }
+            return str.Replace("A", "Α")
+                .Replace("T", "Τ")
+                .Replace("E", "Ε")
+                .Replace("B", "Β")
+                .Replace("P", "Ρ")
+                .Replace("N", "Ν")
+                .Replace("I", "Ι");
         }
 
-
+        public static string Kadify(string kad)
+        {
+            string result = "";
+            int i = 1;
+            foreach (var c in kad)
+            {
+                result += c;
+                if (i % 2 == 0 && i != kad.Length)
+                {
+                    result += '.';
+                }
+                i++;
+            }
+            return result;
+        }
 
     }
 }
