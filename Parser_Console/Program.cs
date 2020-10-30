@@ -1,6 +1,7 @@
 ﻿using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
+using Microsoft.VisualBasic;
 using Parser_Console.Classes;
 using Parser_Console.Interfaces;
 using System;
@@ -16,20 +17,29 @@ namespace Parser_Console
 	{
 		static void Main(string[] args)
 		{
+			var folders = Directory.GetDirectories(@"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΑΤΤΕ3-ΒΑΡΕ6-ΝΑΙΕ2").ToList();
+			foreach (var folder in folders)
+			{
+				if(Path.GetFileName(folder) != Functions.Englify(Path.GetFileName(folder)))
+				{
+					string newName = @"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΑΤΤΕ3-ΒΑΡΕ6-ΝΑΙΕ2\" + Functions.Englify(Path.GetFileName(folder));
+					FileSystem.Rename(folder, newName);
+				}
+			}
 			//Functions.UnRar(@"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΚΜΕ7\ΚΜΕ7-0079795 - Copy\ΣΥΝΝΗΜΕΝΑ__11127541.rar",@"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΚΜΕ7\ΚΜΕ7-0079795 - Copy");
 			//Functions.UploadFileSCP();
 			//Functions.UploadStream("ΚΜΕ7-0079786", File.ReadAllBytes(@"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΚΜΕ7\test.zip"), "test.zip");
 
 			//Project_Collection projects = new Project_Collection();
 			//Project_Collection projects = Functions.LoadFromFile(@"C:\Users\chatziparadeisis.i\Documents\covid\athens.fol");
-			Project_Collection projects = Functions.LoadFromFile(@"C:\Users\chatziparadeisis.i\Documents\covid\collection.fol");
-			projects.Projects.ForEach(x => x.Uploaded = false);
+			//projects.Projects.ForEach(x => x.Uploaded = false);
 			//projects.ScanPath(@"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΑΤΤΕ3-ΒΑΡΕ6-ΝΑΙΕ2");
-			//var p = projects.Projects.Where(x => x.Uploaded).ToList();
-			var p2 = projects.Projects.Where(x => !x.Uploaded).Where(x => x.CanUpload).ToList();
+			//string NothingPaths = string.Join("\n", projects.Projects.Where(x => x.HasNothing).Select(x => x.ProjectPath));
+			//var p2 = projects.Projects.Where(x => !x.Uploaded).ToList();
+			//var p3 = projects.Projects.Where(x => x.Uploaded).ToList();
 			//projects.Projects.ForEach(x => x.UploadProject());
 			//DateTime start = DateTime.Now;
-			p2.ForEach(x => x.UploadProject());
+			//p2.ForEach(x => x.UploadProject());
 			//Parallel.ForEach(p2, project =>
 			//{
 			//	try
@@ -56,7 +66,7 @@ namespace Parser_Console
 			//projects.Taxis.Where(x => x.DocType == 1).ToList().ForEach(x => x.Scan());
 			//projects.ScanPath(@"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΚΜΕ7");
 			//Functions.SaveToFile(projects,@"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΚΜΕ7\collection.fol");
-			Functions.SaveToFile(projects, @"C:\Users\chatziparadeisis.i\Documents\covid\collection.fol");
+			//Functions.SaveToFile(projects, @"C:\Users\chatziparadeisis.i\Documents\covid\athens.fol");
 		}
     }
 }

@@ -16,7 +16,7 @@ namespace Parser_Console.Classes
     {
         public static string PrintType1Header = @"Ο λογαριασμός μου {1,}Εφαρμογές TAXISnet {1,}Προσωπ.Πληρ/ση {1,}Αποσύνδεση";
         public static string PrintType2Header = @"\d{1,2}\d{1,2}\d{2} {1,}TaxisNET";
-        public static string Kad = @"\d{8}( |\n)";
+        public static string Kad = @"\d{6,8}( |\n)";
         public static string DateShortYear = @"\d{1,2}/\d{1,2}/\d{2}";
         public static string DateLongYear = @"\d{1,2}/\d{1,2}/\d{4}";
         public static string KadHeader = @"Κωδικός.*?∆ραστηριότητα.*?Είδος.*?Ημ/νία.*?έναρξης.*?Ημ/νία.*?διακοπής";

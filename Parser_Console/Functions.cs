@@ -267,6 +267,7 @@ namespace Parser_Console
 
         public static string GetRegionByPrefix(string prefix)
         {
+            prefix = Greekify(prefix);
             switch (prefix)
             {
                 case "ΚΜΕ7":
@@ -403,6 +404,17 @@ namespace Parser_Console
                 .Replace("P", "Ρ")
                 .Replace("N", "Ν")
                 .Replace("I", "Ι");
+        }
+
+        public static string Englify(string str)
+        {
+            return str.Replace("Α","A")
+                .Replace( "Τ","T")
+                .Replace( "Ε","E")
+                .Replace( "Β","B")
+                .Replace( "Ρ","P")
+                .Replace( "Ν","N")
+                .Replace( "Ι","I");
         }
 
         public static string Kadify(string kad)

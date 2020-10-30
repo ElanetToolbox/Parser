@@ -22,8 +22,10 @@ namespace Parser_Console.Classes
 		public int Year { get; set; }
 		public string FormNumber { get; set; }
 		public string KadMain { get; set; }
-		public string KadIncome { get; set; }
-		public List<KeyValuePair<string, decimal?>> Values;
+        public string KadMainClean => KadMain != null ? KadMain.Substring(KadMain.Length - 8) : "";
+        public string KadIncome { get; set; }
+        public string KadIncomeClean => KadIncome != null ? KadIncome.Substring(KadMain.Length - 8) : "";
+        public List<KeyValuePair<string, decimal?>> Values;
 		public bool ParsingErrorInternal { get; set; }
 		public bool ParsingErrorExternal { get; set; }
         public DocumentCollection Collection { get; set; }

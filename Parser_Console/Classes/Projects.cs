@@ -1,6 +1,7 @@
 ﻿using Parser_Console.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,8 +21,13 @@ namespace Parser_Console.Classes
         public List<E3> ErrorE3s => E3s.Where(x => x.ParsingErrorExternal).ToList();
         public List<Taxis> ErrorTaxis => Taxis.Where(x => x.ParsingErrorExternal).ToList();
         public List<E3> CompleteE3s => E3s.Where(x => x.Complete).ToList();
-        public List<Taxis> CompleteTaxis => Taxis.Where(x => x.Complete).ToList();
         public List<Project> CompleteProjects => Projects.Where(x => x.Complete).ToList();
+
+        public int HaveE3 => Projects.Where(x => x.HasE3).Count();
+        public int HaveTaxisC => Projects.Where(x => x.HasTaxisCompany).Count();
+        public int HaveTaxisE => Projects.Where(x => x.HasTaxisEstablishments).Count();
+
+        public int EmptyProjects => Projects.Where(x => x.HasNothing).Count();
 
 
         public Project_Collection()
@@ -31,6 +37,8 @@ namespace Parser_Console.Classes
         
         public void ScanPath(string path,bool serial = false)
         {
+            var originalCulture = CultureInfo.CurrentCulture;
+            CultureInfo.CurrentCulture = new CultureInfo("el-GR");
 			var folders = Directory.GetDirectories(path).ToList();
             IEnumerable<string> existing = Projects.Select(x => x.ProjectPath);
             folders = folders.Except(existing).Take(100).ToList();
@@ -38,7 +46,6 @@ namespace Parser_Console.Classes
 
             if (serial)
             {
-
                 foreach (var folder in folders)
                 {
                     ScanFolder(folder);
@@ -61,6 +68,7 @@ namespace Parser_Console.Classes
             string[] s = Global.exitCodes;
 
             Functions.SaveToFile(this,@"C:\Users\chatziparadeisis.i\Documents\covid\athens.fol");
+            CultureInfo.CurrentCulture = originalCulture;
         }
 
         private void ScanFolder(string folder)
