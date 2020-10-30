@@ -382,7 +382,7 @@ namespace Parser_Console
 
         public static void UploadFileSCP(string Code,string path)
         {
-            string command = @"gcloud compute scp --recurse " + path + @" bitnami@api-vm:/opt/bitnami/apps/covidpdf/staging";
+            string command = @"gcloud compute scp --recurse " + path + @" bitnami@api-vm:/opt/bitnami/apps/covidpdf/production";
             var proc1 = new ProcessStartInfo();
             proc1.UseShellExecute = true;
 
