@@ -58,7 +58,11 @@ namespace Parser_Console.Classes
             Functions.UploadFileSCP(Code, Path.GetDirectoryName(zipPath));
             Directory.Delete(Path.GetDirectoryName(zipPath), true);
 
-            Functions.ExtractFiles(path);
+            try
+            {
+                Functions.ExtractFiles(path);
+            }
+            catch { FolderError = true; }
 
             var pdfs = Directory.GetFiles(path, "*.pdf",SearchOption.AllDirectories);
             Docs = new DocumentCollection();
