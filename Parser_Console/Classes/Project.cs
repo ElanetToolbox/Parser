@@ -54,9 +54,9 @@ namespace Parser_Console.Classes
             ProjectPath = path;
 			Code = Path.GetFileName(path);
 
-            string zipPath = Functions.CompressFolder(path);
-            Functions.UploadFileSCP(Code, Path.GetDirectoryName(zipPath));
-            Directory.Delete(Path.GetDirectoryName(zipPath), true);
+            //string zipPath = Functions.CompressFolder(path);
+            //Functions.UploadFileSCP(Code, Path.GetDirectoryName(zipPath));
+            //Directory.Delete(Path.GetDirectoryName(zipPath), true);
 
             //Functions.ExtractFiles(path);
 

@@ -37,8 +37,6 @@ namespace Parser_Console.Classes
         
         public void ScanPath(string path,bool serial = false)
         {
-            var originalCulture = CultureInfo.CurrentCulture;
-            CultureInfo.CurrentCulture = new CultureInfo("el-GR");
 			var folders = Directory.GetDirectories(path).ToList();
             IEnumerable<string> existing = Projects.Select(x => x.ProjectPath);
             folders = folders.Except(existing).Take(100).ToList();
@@ -68,7 +66,6 @@ namespace Parser_Console.Classes
             string[] s = Global.exitCodes;
 
             Functions.SaveToFile(this,@"C:\Users\chatziparadeisis.i\Documents\covid\athens.fol");
-            CultureInfo.CurrentCulture = originalCulture;
         }
 
         private void ScanFolder(string folder)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
@@ -121,7 +122,7 @@ namespace Parser_Console.Classes
 			string n = lineText.Substring(iNo +fNo.ToString().Length).Replace(" ","").Replace(".","").Replace(",",".");
 			try
 			{
-				decimal result = decimal.Parse(n);
+				decimal result = decimal.Parse(n, NumberStyles.Any,new CultureInfo("en-US"));
 				return result;
 			}
 			catch
@@ -143,7 +144,7 @@ namespace Parser_Console.Classes
 			string n = lineText.Substring(i1No +f1No.ToString().Length,length).Replace(" ","").Replace(".","").Replace(",",".");
 			try
 			{
-				decimal result = decimal.Parse(n);
+				decimal result = decimal.Parse(n, NumberStyles.Any,new CultureInfo("en-US"));
 				return result;
 			}
 			catch
