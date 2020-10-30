@@ -54,11 +54,11 @@ namespace Parser_Console.Classes
             ProjectPath = path;
 			Code = Path.GetFileName(path);
 
-            //string zipPath = Functions.CompressFolder(path);
-            //Functions.UploadFileSCP(Code, Path.GetDirectoryName(zipPath));
-            //Directory.Delete(Path.GetDirectoryName(zipPath), true);
+            string zipPath = Functions.CompressFolder(path);
+            Functions.UploadFileSCP(Code, Path.GetDirectoryName(zipPath));
+            Directory.Delete(Path.GetDirectoryName(zipPath), true);
 
-            //Functions.ExtractFiles(path);
+            Functions.ExtractFiles(path);
 
             var pdfs = Directory.GetFiles(path, "*.pdf",SearchOption.AllDirectories);
             Docs = new DocumentCollection();
