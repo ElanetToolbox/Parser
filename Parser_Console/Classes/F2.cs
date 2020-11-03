@@ -26,7 +26,7 @@ namespace Parser_Console.Classes
 
         public void Scan()
         {
-            WorkCycle = decimal.Parse(RectangleScan(Rectangles.Where(x => x.Key == "WorkCycle").Single().Value).Replace(".", "").Replace(",", "."));
+            WorkCycle = decimal.Parse(RectangleScan(Rectangles.Where(x => x.Key == "WorkCycle").Single().Value).Replace(".", ""),CultureInfo.GetCultureInfo("el-GR"));
             DateStart = DateTime.ParseExact(RectangleScan(Rectangles.Where(x => x.Key == "DateStart").Single().Value), @"dd/MM/yy", CultureInfo.InvariantCulture);
             DateEnd = DateTime.ParseExact(RectangleScan(Rectangles.Where(x => x.Key == "DateEnd").Single().Value), @"dd/MM/yy", CultureInfo.InvariantCulture);
             DateSubmitted = DateTime.ParseExact(RectangleScan(Rectangles.Where(x => x.Key == "DateSubmitted").Single().Value), @"dd/MM/yy", CultureInfo.InvariantCulture);
