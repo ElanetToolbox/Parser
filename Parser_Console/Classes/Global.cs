@@ -1,4 +1,5 @@
-﻿using System;
+﻿using iText.Kernel.Geom;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,6 +11,19 @@ namespace Parser_Console.Classes
         public static int current;
         public static string currentPath;
         public static string[] exitCodes;
+
+        public static Dictionary<string,Rectangle> GetRectangles()
+        {
+            Dictionary<string, Rectangle> list = new Dictionary<string, Rectangle>() 
+            {
+                { "WorkCycle",new Rectangle(0,375,200,15) },
+                { "DateStart",new Rectangle(0,710,200,30) },
+                { "DateEnd",new Rectangle(200,710,200,30) },
+                { "DateSubmitted",new Rectangle(0,770,600,30) },
+            };
+
+            return list;
+        }
     }
 
     public static class RegexPatterns

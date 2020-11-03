@@ -20,7 +20,7 @@ namespace Parser_Console.Classes
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
         public decimal WorkCycle { get; set; }
-        public Dictionary<string,Rectangle> Rectangles => GetRectangles();
+        public Dictionary<string,Rectangle> Rectangles => Global.GetRectangles();
 
         public bool ParsingErrorExternal { get; set; }
 
@@ -49,17 +49,5 @@ namespace Parser_Console.Classes
             return result;
         }
 
-        public Dictionary<string,Rectangle> GetRectangles()
-        {
-            Dictionary<string, Rectangle> list = new Dictionary<string, Rectangle>() 
-            {
-                { "WorkCycle",new Rectangle(0,375,200,15) },
-                { "DateStart",new Rectangle(0,710,200,30) },
-                { "DateEnd",new Rectangle(200,710,200,30) },
-                { "DateSubmitted",new Rectangle(0,770,600,30) },
-            };
-
-            return list;
-        }
     }
 }
