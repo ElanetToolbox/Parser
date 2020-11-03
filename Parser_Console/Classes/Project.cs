@@ -83,56 +83,26 @@ namespace Parser_Console.Classes
             newUpload.Log = "";
             newUpload.ProjectFileId = Functions.Greekify(Code);
 
-            E3 correctE3 = Docs.E3s
-                .Where(x=>x.Complete)
-                .Where(x => x.Year == 2019)
-                .Where(x => !string.IsNullOrWhiteSpace(x.FormNumber))
-                .OrderByDescending(x=>x.FormNumber)
-                .FirstOrDefault();
+            E3 correctE3 = GetCorrectE3(Afm, newUpload);
 
-            Taxis correctTaxisCompany = Docs.TaxisList
-                .Where(x => x.Complete)
-                .Where(x => x.Afm == Afm)
-                .Where(x => x.DocType == 0)
-                .Where(x => x.Region == Region)
-                .Where(x => DateTime.Compare(new DateTime(2018, 12, 31), x.StartDate) > 0)
-                .SingleOrDefault();
+            Taxis correctTaxisCompany = GetCorrectTaxis(Afm, newUpload);
 
             if (correctE3 != null && correctE3.Afm == Afm)
             {
-                newUpload.f102E32019  = correctE3.Values.Where(x => x.Key == "102").Single().Value.Value.ToString("N2").Replace(",","");
-                newUpload.f202E32019  = correctE3.Values.Where(x => x.Key == "202").Single().Value.Value.ToString("N2").Replace(",","");
-                newUpload.f181E32019  = correctE3.Values.Where(x => x.Key == "181").Single().Value.Value.ToString("N2").Replace(",","");
-                newUpload.f281E32019  = correctE3.Values.Where(x => x.Key == "281").Single().Value.Value.ToString("N2").Replace(",","");
-                newUpload.f481E32019  = correctE3.Values.Where(x => x.Key == "481").Single().Value.Value.ToString("N2").Replace(",","");
-                newUpload.f185E32019  = correctE3.Values.Where(x => x.Key == "185").Single().Value.Value.ToString("N2").Replace(",","");
-                newUpload.f285E32019  = correctE3.Values.Where(x => x.Key == "285").Single().Value.Value.ToString("N2").Replace(",","");
-                newUpload.f485E32019  = correctE3.Values.Where(x => x.Key == "485").Single().Value.Value.ToString("N2").Replace(",","");
-                newUpload.Turnover2019 = correctE3.Values.Where(x => x.Key == "500").Single().Value.Value.ToString("N2").Replace(",","");
-                newUpload.EBITDA2019  = correctE3.Values.Where(x => x.Key == "524").Single().Value.Value.ToString("N2").Replace(",","");
+                newUpload.f102E32019 = correctE3.Values.Where(x => x.Key == "102").Single().Value.Value.ToString("N2").Replace(",", "");
+                newUpload.f202E32019 = correctE3.Values.Where(x => x.Key == "202").Single().Value.Value.ToString("N2").Replace(",", "");
+                newUpload.f181E32019 = correctE3.Values.Where(x => x.Key == "181").Single().Value.Value.ToString("N2").Replace(",", "");
+                newUpload.f281E32019 = correctE3.Values.Where(x => x.Key == "281").Single().Value.Value.ToString("N2").Replace(",", "");
+                newUpload.f481E32019 = correctE3.Values.Where(x => x.Key == "481").Single().Value.Value.ToString("N2").Replace(",", "");
+                newUpload.f185E32019 = correctE3.Values.Where(x => x.Key == "185").Single().Value.Value.ToString("N2").Replace(",", "");
+                newUpload.f285E32019 = correctE3.Values.Where(x => x.Key == "285").Single().Value.Value.ToString("N2").Replace(",", "");
+                newUpload.f485E32019 = correctE3.Values.Where(x => x.Key == "485").Single().Value.Value.ToString("N2").Replace(",", "");
+                newUpload.Turnover2019 = correctE3.Values.Where(x => x.Key == "500").Single().Value.Value.ToString("N2").Replace(",", "");
+                newUpload.EBITDA2019 = correctE3.Values.Where(x => x.Key == "524").Single().Value.Value.ToString("N2").Replace(",", "");
                 newUpload.KadSuggestBiggest = new KadUpload();
                 newUpload.KadSuggestBiggest.KadEnumID = Functions.Kadify(correctE3.KadIncome);
-                newUpload.KadSuggestMain =new KadUpload();
+                newUpload.KadSuggestMain = new KadUpload();
                 newUpload.KadSuggestMain.KadEnumID = Functions.Kadify(correctE3.KadMain);
-            }
-            else
-            {
-                if(Docs.E3s.Count == 0)
-                {
-                    newUpload.Log += "Δεν βρέθηκαν Ε3 σε αναγνώσιμη μορφή";
-                }
-                else if(Docs.E3s.Where(x=>x.Year == 2019).Count() == 0)
-                {
-                    newUpload.Log += "Δέν βρέθηκε Ε3 του 2019";
-                }
-                else if(Docs.E3s.Where(x=>!string.IsNullOrWhiteSpace(x.FormNumber)).Count() == 0)
-                {
-                    newUpload.Log += "Δέν βρέθηκε Ε3 του 2019 με αριθμό δήλωσης";
-                }
-                else if(correctE3.Afm != Afm)
-                {
-                    newUpload.Log += "Δέν βρέθηκε Ε3 με το ΑΦΜ της εταιρίας";
-                }
             }
 
             if (correctTaxisCompany != null)
@@ -143,44 +113,119 @@ namespace Parser_Console.Classes
                 newUpload.PostCode = correctTaxisCompany.PostCode;
                 if (correctE3 != null)
                 {
-                    newUpload.KadSuggestBiggest.StartDate = correctTaxisCompany.Kads.Where(x => x.Code == correctE3.KadIncomeClean && x.DateEnd == null).Single().DateStart.ToString("dd/MM/yyyy");
+                    newUpload.KadSuggestBiggest.StartDate = correctTaxisCompany.Kads.Where(x => x.Code == correctE3.KadIncome && x.DateEnd == null).Single().DateStart.ToString("dd/MM/yyyy");
                     newUpload.KadSuggestBiggest.PostCode = correctTaxisCompany.PostCode;
-                    newUpload.KadSuggestMain.StartDate = correctTaxisCompany.Kads.Where(x => x.Code == correctE3.KadMainClean && x.DateEnd == null).SingleOrDefault().DateStart.ToString("dd/MM/yyyy");
+                    newUpload.KadSuggestMain.StartDate = correctTaxisCompany.Kads.Where(x => x.Code == correctE3.KadMain && x.DateEnd == null).SingleOrDefault().DateStart.ToString("dd/MM/yyyy");
                     newUpload.KadSuggestMain.PostCode = correctTaxisCompany.PostCode;
                 }
-            }
 
-            if(TaxisEstablishment.Where(x=>x.Complete).Count() > 0)
-            {
-                newUpload.KadImplementationPlaces = new List<KadUpload>();
-                foreach (var est in TaxisEstablishment.Where(x=>x.Complete))
+                if(correctTaxisCompany.Establishments == null)
                 {
-                    foreach (var kad in est.Kads)
-                    {
-                        KadUpload newKad = new KadUpload();
-                        newKad.KadEnumID = Functions.Kadify(kad.Code);
-                        newKad.StartDate = kad.DateStart.ToString("dd/MM/yyyy");
-                        newKad.PostCode = est.PostCode;
-                        newUpload.KadImplementationPlaces.Add(newKad);
-                    }
+                    return newUpload;
+                }
 
+                if ( correctTaxisCompany.Establishments.Count > 0)
+                {
+                    if (TaxisEstablishment.Where(x => x.Complete).Count() > 0)
+                    {
+                        newUpload.KadImplementationPlaces = new List<KadUpload>();
+                        foreach (var est in TaxisEstablishment.Where(x => x.Complete))
+                        {
+                            foreach (var kad in est.Kads)
+                            {
+                                KadUpload newKad = new KadUpload();
+                                newKad.KadEnumID = Functions.Kadify(kad.Code);
+                                newKad.StartDate = kad.DateStart.ToString("dd/MM/yyyy");
+                                newKad.PostCode = est.PostCode;
+                                newUpload.KadImplementationPlaces.Add(newKad);
+                            }
+                        }
+                        newUpload.Log += "Τα στοιχεία εγκαταστάσεων εσωτερικού (μέσω TaxisNET) αντλήθηκαν από τα αρχεία "
+                            + string.Join(", ", TaxisEstablishment.Where(x => x.Complete).Select(x => Path.GetFileName(x.FilePath)))
+                            + "\n";
+                    }
+                    else
+                    {
+                        newUpload.Log += "Δεν βρέθηκε εκτύπώση εγκαταστάσεων εσωτερικού (μέσω TaxisNET) σε αναγνώσιμη μορφή" + "\n";
+                    }
                 }
             }
-            string test = newUpload.ToJsonString();
+
             return newUpload;
+        }
+
+        private Taxis GetCorrectTaxis(string Afm, Upload newUpload)
+        {
+            IEnumerable<Taxis> possibleTaxis = Docs.TaxisList.Where(x => x.Complete).Where(x => x.DocType == 0);
+            if (possibleTaxis.Count() == 0)
+            {
+                newUpload.Log += "Δεν βρέθηκε εκτύπωση προσωποποιημένης πληροφόρησης (μέσω TaxisNET) σε αναγνώσιμη μορφή" + "\n";
+                return null;
+            }
+            possibleTaxis = possibleTaxis.Where(x => x.Afm == Afm);
+            if(possibleTaxis.Count() == 0)
+            {
+                newUpload.Log += "Δεν βρέθηκε αναγνώσιμη εκτύπωση προσωποποιημένης πληροφόρησης (μέσω TaxisNET) με το ΑΦΜ της εταιρίας" + "\n";
+                return null;
+            }
+            possibleTaxis = possibleTaxis.Where(x => x.Region == Region);
+            if(possibleTaxis.Count() == 0)
+            {
+                newUpload.Log += "Δεν βρέθηκε αναγνώσιμη εκτύπωση προσωποποιημένης πληροφόρησης (μέσω TaxisNET) με το ΑΦΜ της εταιρίας στην περιφέρεια υλοποίησης" + "\n";
+                return null;
+            }
+
+            Taxis correctTaxisCompany = possibleTaxis.FirstOrDefault();
+            newUpload.Log += "Τα στοιχεία προσωποποιημένης πληροφόρησης (μέσω TaxisNET) αντλήθηκαν από το αρχείο " + Path.GetFileName(correctTaxisCompany.FilePath) + "\n";
+
+            return correctTaxisCompany;
+        }
+
+        private E3 GetCorrectE3(string Afm, Upload newUpload)
+        {
+            IEnumerable<E3> possibleE3s = Docs.E3s.Where(x => x.Complete);
+            if(possibleE3s.Count() == 0)
+            {
+                newUpload.Log += "Δεν βρέθηκε Ε3 σε αναγνώσιμη μορφή" + "\n";
+                return null;
+            }
+            possibleE3s = possibleE3s.Where(x => x.Year == 2019);
+            if(possibleE3s.Count() == 0)
+            {
+                newUpload.Log += "Δεν βρέθηκε αναγνώσιμος Ε3 για το φορολογικό έτος 2019" + "\n";
+                return null;
+            }
+            possibleE3s = possibleE3s.Where(x => x.Afm == Afm);
+            if(possibleE3s.Count() == 0)
+            {
+                newUpload.Log += "Δεν βρέθηκε αναγνώσιμος Ε3 για το φορολογικό έτος 2019 με το ΑΦΜ της εταιρίας" + "\n";
+                return null;
+            }
+            possibleE3s = possibleE3s.Where(x => !string.IsNullOrWhiteSpace(x.FormNumber));
+            if (possibleE3s.Count() == 0)
+            {
+                newUpload.Log += "Δεν βρέθηκε αναγνώσιμος Ε3 για το φορολογικό έτος 2019 με το ΑΦΜ της εταιρίας και αριθμό υποβολής" + "\n";
+                return null;
+            }
+
+            E3 correctE3 = possibleE3s.OrderByDescending(x => x.FormNumber).FirstOrDefault();
+            newUpload.Log += "Τα οικονομικά στοιχεία (Ε3) αντλήθηκαν από το αρχείο " + Path.GetFileName(correctE3.FilePath) + "\n";
+
+            return correctE3;
         }
 
         public void UploadProject()
         {
-            if (!CanUpload)
+            if (!CanUpload || Uploaded)
             {
                 return;
             }
             Upload newUpload = CreateUpload();
-            Functions.UploadStream(Code, Encoding.UTF8.GetBytes(newUpload.Log), "report.txt");
+            Functions.UploadStream(Functions.Greekify(Code), Encoding.UTF8.GetBytes(newUpload.Log), "report.txt");
             newUpload.UploadToCloud(Functions.Greekify(Code));
             Uploaded = true;
         }
+
 
     }
 }

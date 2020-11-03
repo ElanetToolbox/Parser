@@ -23,14 +23,12 @@ namespace Parser_Console.Classes
 		public int Year { get; set; }
 		public string FormNumber { get; set; }
 		public string KadMain { get; set; }
-        public string KadMainClean => KadMain != null ? KadMain.Substring(KadMain.Length - 8) : "";
         public string KadIncome { get; set; }
-        public string KadIncomeClean => KadIncome != null ? KadIncome.Substring(KadMain.Length - 8) : "";
         public List<KeyValuePair<string, decimal?>> Values;
 		public bool ParsingErrorInternal { get; set; }
 		public bool ParsingErrorExternal { get; set; }
         public DocumentCollection Collection { get; set; }
-		public bool Complete => Afm != null && Values.Count == 10 && Year == 2019 && !Values.Where(x => x.Value == null).Any();
+		public bool Complete => Afm != null && Values.Count == 10 && !Values.Where(x => x.Value == null).Any();
 
 		public E3()
 		{
@@ -53,7 +51,7 @@ namespace Parser_Console.Classes
 			Year = GetYear(p1, 7);
 			FormNumber = GetFormNo(p1, 10);
 			KadIncome = GetKadIncome(p1);
-			KadMain = GetKadIncome(p1);
+			KadMain = GetKadMain(p1);
 
 			string p2 = PdfTextExtractor.GetTextFromPage(doc.GetPage(2),new LocationTextExtractionStrategy());
 			Values.Add(new KeyValuePair<string, decimal?>("102", GetSingle(p2,9,102)));
@@ -88,7 +86,7 @@ namespace Parser_Console.Classes
 		string GetKadMain(string page)
 		{
 			string lineText = Functions.GetLine(page, 29);
-			int i1No = lineText.IndexOf("021");
+			int i1No = lineText.IndexOf("021 ");
 			if(i1No == -1)
 			{
 				return null;
@@ -102,7 +100,7 @@ namespace Parser_Console.Classes
 		string GetKadIncome(string page)
 		{
 			string lineText = Functions.GetLine(page, 29);
-			int i1No = lineText.IndexOf("022");
+			int i1No = lineText.IndexOf("022 ");
 			if(i1No == -1)
 			{
 				return null;

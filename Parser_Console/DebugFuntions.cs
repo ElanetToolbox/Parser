@@ -59,8 +59,11 @@ namespace Parser_Console
             {
                 PdfPage d = doc.GetPage(i);
                 string full = PdfTextExtractor.GetTextFromPage(d, new LocationTextExtractionStrategy());
+                Rectangle t = d.GetPageSize();
                 Rectangle z = d.GetPageSize();
-                z.SetY(z.GetHeight() / 2);
+                //z.SetY(-450);
+                z.SetHeight(15);
+                z.SetY(375);
                 TextRegionEventFilter filter = new TextRegionEventFilter(z);
                 FilteredTextEventListener list = new FilteredTextEventListener(new LocationTextExtractionStrategy(), filter);
                 string half = PdfTextExtractor.GetTextFromPage(d, list);

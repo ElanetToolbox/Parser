@@ -39,7 +39,7 @@ namespace Parser_Console.Classes
         {
 			var folders = Directory.GetDirectories(path).ToList();
             IEnumerable<string> existing = Projects.Select(x => x.ProjectPath);
-            folders = folders.Except(existing).Take(100).ToList();
+            folders = folders.Except(existing).ToList();
 			DateTime start = DateTime.Now;
 
             if (serial)
@@ -73,6 +73,37 @@ namespace Parser_Console.Classes
             Project newProject = new Project();
             newProject.ScanPath(folder);
             Projects.Add(newProject);
+        }
+
+        public void UploadData(bool serial = false)
+        {
+			DateTime start = DateTime.Now;
+            if (serial)
+            {
+                Projects.ForEach(x => x.UploadProject());
+            }
+            else
+            {
+                Parallel.ForEach(Projects, project =>
+                {
+                    try
+                    {
+                        project.UploadProject();
+                    }
+                    catch
+                    {
+                    }
+                });
+            }
+
+            DateTime end = DateTime.Now;
+			TimeSpan totalTime = end - start;
+            Console.WriteLine(totalTime);
+
+            int uploaded = Projects.Where(x => x.Uploaded).Count();
+            Console.WriteLine(uploaded);
+
+			Functions.SaveToFile(this, @"C:\Users\chatziparadeisis.i\Documents\covid\athens.fol");
         }
     }
 }

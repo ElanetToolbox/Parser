@@ -408,13 +408,13 @@ namespace Parser_Console
 
         public static string Englify(string str)
         {
-            return str.Replace("Α","A")
-                .Replace( "Τ","T")
-                .Replace( "Ε","E")
-                .Replace( "Β","B")
-                .Replace( "Ρ","P")
-                .Replace( "Ν","N")
-                .Replace( "Ι","I");
+            return str.Replace("Α", "A")
+                .Replace("Τ", "T")
+                .Replace("Ε", "E")
+                .Replace("Β", "B")
+                .Replace("Ρ", "P")
+                .Replace("Ν", "N")
+                .Replace("Ι", "I");
         }
 
         public static string Kadify(string kad)

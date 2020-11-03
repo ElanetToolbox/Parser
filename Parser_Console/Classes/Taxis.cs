@@ -39,6 +39,7 @@ namespace Parser_Console.Classes
         public string Region => !string.IsNullOrWhiteSpace(Address) ? Functions.GetRegionByPostCode(PostCode) : "";
 
         public bool Complete => GetCompletion();
+        public bool noKad => Kads == null ? true : false;
         public bool CompanyOk => DocType == 0 && DateTime.Compare(new DateTime(2018, 12, 31), StartDate) > 0;
 
         private Project GetProject()
