@@ -16,6 +16,7 @@ namespace Parser_Console.Classes
 		public List<IDocument> Documents { get; set; }
 		public List<CorruptDocument> corruptDocuments => Documents.Where(x => x is CorruptDocument).Select(x => (CorruptDocument)x).ToList();
 		public List<E3> E3s => Documents.Where(x => x is E3).Select(x => (E3)x).ToList();
+		public List<F2> F2s => Documents.Where(x => x is F2).Select(x => (F2)x).ToList();
 		public List<E3> ValidE3s => Documents.Where(x => x is E3).Select(x => (E3)x).Where(x=>x.Year == 2019).ToList();
 		public List<Taxis> TaxisList => Documents.Where(x => x is Taxis).Select(x => (Taxis)x).ToList();
 		public List<Taxis> ValidTaxisList => TaxisList.Where(x=>x.Complete).ToList();
@@ -61,9 +62,30 @@ namespace Parser_Console.Classes
 				AddTaxis(path);
 				return;
 			}
+			string line1 = Functions.GetLine(p1, 2);
+			string line2 = Functions.GetLine(p1, 3);
+			if(Functions.IsStringNumeric(line1) && Functions.IsStringNumeric(line2))
+			{
+				AddF2(path);
+				return;
+			}
 			AddUnknown(path);
 		}
 
+		private void AddF2(string path)
+		{
+			F2 newF2 = new F2();
+			newF2.FilePath = path;
+			Documents.Add(newF2);
+			try
+			{
+				newF2.Scan();
+			}
+			catch
+			{
+				newF2.ParsingErrorExternal = true;
+			}
+		}
 
 		public void AddE3(string path)
 		{

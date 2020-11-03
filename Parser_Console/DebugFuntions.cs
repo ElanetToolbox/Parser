@@ -63,6 +63,7 @@ namespace Parser_Console
                 Rectangle z = d.GetPageSize();
                 //z.SetY(-450);
                 z.SetHeight(15);
+                z.SetWidth(200);
                 z.SetY(375);
                 TextRegionEventFilter filter = new TextRegionEventFilter(z);
                 FilteredTextEventListener list = new FilteredTextEventListener(new LocationTextExtractionStrategy(), filter);

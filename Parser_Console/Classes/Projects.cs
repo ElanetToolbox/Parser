@@ -14,6 +14,7 @@ namespace Parser_Console.Classes
         public List<Project> Projects { get; set; }
         public List<IDocument> Docs => Projects.Where(x=>x.Docs != null).Select(x => x.Docs).SelectMany(x => x.Documents).ToList();
         public List<E3> E3s => Docs != null ? Docs.Where(x => x is E3).Select(x => (E3)x).ToList() : new List<E3>();
+        public List<F2> F2s => Docs != null ? Docs.Where(x => x is F2).Select(x => (F2)x).ToList() : new List<F2>();
         public List<CorruptDocument> corruptDocuments => Docs != null ? Docs.Where(x => x is CorruptDocument).Select(x => (CorruptDocument)x).ToList() : new List<CorruptDocument>();
         public List<Taxis> Taxis => Docs != null ? Docs.Where(x => x is Taxis).Select(x => (Taxis)x).ToList() : new List<Taxis>();
         public List<Taxis> TaxisCompany => Docs != null ? Taxis.Where(x=>x.DocType==0).ToList() : new List<Taxis>();

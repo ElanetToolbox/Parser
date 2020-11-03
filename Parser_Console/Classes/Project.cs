@@ -17,6 +17,7 @@ namespace Parser_Console.Classes
         public List<Taxis> TaxisCompany => Docs != null ? Docs.TaxisList.Where(x=>x.DocType == 0).ToList() : new List<Taxis>();
         public List<Taxis> TaxisEstablishment  => Docs != null ? Docs.TaxisList.Where(x=>x.DocType == 1).ToList() : new List<Taxis>();
         public List<E3> E3s =>Docs != null ?  Docs.E3s : new List<E3>();
+        public List<F2> F2s =>Docs != null ?  Docs.F2s : new List<F2>();
 
         public bool Complete => TaxisCompany.Where(x=>x.DocType==0).Where(x => x.Complete).Any() && E3s.Where(x => x.Complete).Any();
         public bool CanUpload => FolderError == false && Docs.corruptDocuments.Count == 0;

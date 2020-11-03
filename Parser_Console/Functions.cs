@@ -433,5 +433,12 @@ namespace Parser_Console
             return result;
         }
 
+        public static bool IsStringNumeric(string s)
+        {
+            int x;
+            bool result = int.TryParse(s, out x);
+            return result;
+        }
+
     }
 }
