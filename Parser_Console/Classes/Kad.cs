@@ -85,8 +85,7 @@ namespace Parser_Console.Classes
 
         public void GetDates(string text)
         {
-            Regex regex = new Regex(RegexPatterns.DateLongYear);
-            MatchCollection matches = regex.Matches(text);
+            MatchCollection matches = RegexCollection.DateLongYear.Matches(text);
             DateStart = DateTime.ParseExact(matches[0].Value, "dd/MM/yyyy", CultureInfo.InvariantCulture);
             if(matches.Count == 2)
             {

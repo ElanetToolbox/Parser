@@ -16,6 +16,7 @@ namespace Parser_Console.Classes
     {
         public string FilePath { get; set; }
         public string FileType { get; set; }
+        public string Afm { get; set; }
         public DateTime DateSubmitted { get; set; }
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
@@ -30,6 +31,7 @@ namespace Parser_Console.Classes
             DateStart = DateTime.ParseExact(RectangleScan(Rectangles.Where(x => x.Key == "DateStart").Single().Value), @"dd/MM/yy", CultureInfo.InvariantCulture);
             DateEnd = DateTime.ParseExact(RectangleScan(Rectangles.Where(x => x.Key == "DateEnd").Single().Value), @"dd/MM/yy", CultureInfo.InvariantCulture);
             DateSubmitted = DateTime.ParseExact(RectangleScan(Rectangles.Where(x => x.Key == "DateSubmitted").Single().Value), @"dd/MM/yy", CultureInfo.InvariantCulture);
+            Afm = RectangleScan(Rectangles.Where(x=>x.Key == "Afm").Single().Value);
         }
 
         public void Test()

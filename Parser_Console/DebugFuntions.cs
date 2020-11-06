@@ -23,7 +23,6 @@ namespace Parser_Console
 
         public static void strDiff(string s1, string s2)
         {
-            char c = (char)916;
             char[] a1 = s1.ToCharArray();
             char[] a2 = s2.ToCharArray();
             int d = 0;
@@ -54,7 +53,6 @@ namespace Parser_Console
         {
             PdfReader reader = new PdfReader(path);
             PdfDocument doc = new PdfDocument(reader);
-            ITextExtractionStrategy strat;
             for (int i = 1; i <= doc.GetNumberOfPages(); i++)
             {
                 PdfPage d = doc.GetPage(i);

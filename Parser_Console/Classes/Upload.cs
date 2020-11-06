@@ -11,6 +11,7 @@ namespace Parser_Console.Classes
     public class Upload
     {
         public string ProjectFileId { get; set; }
+        public int PhaseID => 2;
 
         //E3
         public string f102E32019  { get; set; } //102

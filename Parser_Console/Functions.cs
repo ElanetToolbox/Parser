@@ -117,10 +117,10 @@ namespace Parser_Console
         public static List<DateTime> GetDatesInText(string text)
         {
             List<DateTime> result = new List<DateTime>();
-            Regex regex = new Regex(RegexPatterns.DateShortYear);
+            Regex regex = RegexCollection.DateShortYear;
             if (!regex.IsMatch(text))
             {
-                regex = new Regex(RegexPatterns.DateLongYear);
+                regex = RegexCollection.DateLongYear;
             }
             MatchCollection matches = regex.Matches(text);
             foreach (Match match in matches)
@@ -374,8 +374,7 @@ namespace Parser_Console
 
         public static string GetPostCodeFromAddress(string address)
         {
-            Regex r = new Regex(RegexPatterns.PostCode);
-            Match m = r.Match(address);
+            Match m = RegexCollection.PostCode.Match(address);
             string result = m.Value.Replace("ΤΚ:","").Trim();
             return result;
         }

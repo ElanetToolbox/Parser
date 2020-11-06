@@ -25,9 +25,10 @@ namespace Parser_Console.Classes
 		public string KadMain { get; set; }
         public string KadIncome { get; set; }
         public List<KeyValuePair<string, decimal?>> Values;
-		public bool ParsingErrorInternal { get; set; }
+        public DateTime DateSubmitted { get; set; }
+
+        public bool ParsingErrorInternal { get; set; }
 		public bool ParsingErrorExternal { get; set; }
-        public DocumentCollection Collection { get; set; }
 		public bool Complete => Afm != null && Values.Count == 10 && !Values.Where(x => x.Value == null).Any();
 
 		public E3()
@@ -59,15 +60,19 @@ namespace Parser_Console.Classes
 			Values.Add(new KeyValuePair<string, decimal?>("500", GetSingle(p2,6,500)));
 			Values.Add(new KeyValuePair<string, decimal?>("524", GetSingle(p2,56,524)));
 
-			reader = new PdfReader(path);
 			string p3 = PdfTextExtractor.GetTextFromPage(doc.GetPage(3),new LocationTextExtractionStrategy());
 			Values.Add(new KeyValuePair<string, decimal?>("181", GetBetween(p3,75,181,281)));
 			Values.Add(new KeyValuePair<string, decimal?>("281", GetBetween(p3,75,281,381)));
 			Values.Add(new KeyValuePair<string, decimal?>("481", GetBetween(p3,75,481,581)));
 			Values.Add(new KeyValuePair<string, decimal?>("185", GetBetween(p3,79,185,285)));
-			Values.Add(new KeyValuePair<string, decimal?>("285", GetBetween(p3,79,285,385)));
-			Values.Add(new KeyValuePair<string, decimal?>("485", GetBetween(p3,79,485,585)));
+            Values.Add(new KeyValuePair<string, decimal?>("285", GetBetween(p3, 79, 285, 385)));
+            Values.Add(new KeyValuePair<string, decimal?>("485", GetBetween(p3,79,485,585)));
+
+			string p5 = PdfTextExtractor.GetTextFromPage(doc.GetPage(5),new LocationTextExtractionStrategy());
+			DateSubmitted = GetDateSubmitted(p5, 52);
 		}
+
+
 
 		string GetAfm(string page)
 		{
@@ -162,6 +167,13 @@ namespace Parser_Console.Classes
 		string GetFormNo(string page,int line)
 		{
 			return Functions.GetLine(page, line).Substring(3).Replace(" ","");
+		}
+
+		DateTime GetDateSubmitted(string page,int line)
+		{
+			string dateStr = Functions.GetLine(page, line);
+			DateTime result =  DateTime.ParseExact(dateStr, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+			return result;
 		}
 
 	}

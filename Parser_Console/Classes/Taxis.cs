@@ -193,11 +193,9 @@ namespace Parser_Console.Classes
         public void SetType(string text)
         {
             //string finder = "  Ο λογαριασμός μου    Εφαρμογές TAXISnet    Προσωπ.Πληρ/ση    Αποσύνδεση  ";
-            Regex regex1 = new Regex(RegexPatterns.PrintType1Header);
-            Regex regex2 = new Regex(RegexPatterns.PrintType2Header);
             string line1 = Functions.GetLine(text, 1);
             //int fIndex = line1.IndexOf(finder);
-            if (regex1.IsMatch(line1))
+            if (RegexCollection.PrintType1Header.IsMatch(line1))
             {
                 PrintType = 0;
                 var date = Functions.GetDatesInText(Functions.GetLine(text,-1));
@@ -207,7 +205,7 @@ namespace Parser_Console.Classes
                 }
                 PrintDate = date.First();
             }
-            else if(regex2.IsMatch(line1))
+            else if(RegexCollection.PrintType2Header.IsMatch(line1))
             {
                 PrintType = 1;
                 PrintDate = Functions.GetDatesInText(line1).First();
@@ -227,8 +225,7 @@ namespace Parser_Console.Classes
             {
                 return;
             }
-            Regex reg = new Regex(RegexPatterns.Kad);
-            MatchCollection matches = reg.Matches(allKadText);
+            MatchCollection matches = RegexCollection.Kad.Matches(allKadText);
             allKadText = allKadText.Substring(allKadText.IndexOf(matches[0].Value));
             for (int i = 0; i < matches.Count; i++)
             {
@@ -261,8 +258,7 @@ namespace Parser_Console.Classes
                 return;
             }
             Establishments = new List<Establishment>();
-            Regex r = new Regex(RegexPatterns.EstablishmentEnd);
-            MatchCollection matches = r.Matches(allEstablishmentText);
+            MatchCollection matches = RegexCollection.EstablishmentEnd.Matches(allEstablishmentText);
             for (int i = 1; i <= matches.Count; i++)
             {
                 string startText = i.ToString();
@@ -280,8 +276,7 @@ namespace Parser_Console.Classes
 
         public string GetEstablishmentText(string text)
         {
-            Regex r = new Regex(RegexPatterns.EstablishmentHeader,RegexOptions.Singleline);
-            MatchCollection m = r.Matches(text);
+            MatchCollection m = RegexCollection.EstablishmentHeader.Matches(text);
             string endText = "Στοιχεία Έδρας Αλλοδαπής";
             if(m.Count == 0)
             {
@@ -298,8 +293,7 @@ namespace Parser_Console.Classes
 
         public string GetKadText(string text)
         {
-            Regex r = new Regex(RegexPatterns.KadHeader,RegexOptions.Singleline);
-            MatchCollection m = r.Matches(text);
+            MatchCollection m = RegexCollection.KadHeader.Matches(text);
             string endText = "";
             if (DocType == 0)
             {
