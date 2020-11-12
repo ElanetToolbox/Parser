@@ -37,6 +37,7 @@ namespace Parser_Console.Classes
             DateEnd = DateTime.ParseExact(RectangleScan(Rectangles.Where(x => x.Key == "DateEnd").Single().Value), @"dd/MM/yy", CultureInfo.InvariantCulture);
             DateSubmitted = DateTime.ParseExact(RectangleScan(Rectangles.Where(x => x.Key == "DateSubmitted").Single().Value), @"dd/MM/yy", CultureInfo.InvariantCulture);
             Afm = RectangleScan(Rectangles.Where(x=>x.Key == "Afm").Single().Value);
+            FormNumber = RectangleScan(Rectangles.Where(x=>x.Key == "FormNumber").Single().Value);
         }
 
         public void Test()
