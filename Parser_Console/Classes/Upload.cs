@@ -38,6 +38,10 @@ namespace Parser_Console.Classes
         public string PostCode { get; set; }
         public List<KadUpload> KadImplementationPlaces { get; set; }
 
+        //f2
+        public string Turnover2019A { get; set; }
+        public string Turnover2020B { get; set; }
+
         public string Log { get; set; }
 
         public string ToJsonString()

@@ -18,18 +18,8 @@ namespace Parser_Console
 		static void Main(string[] args)
 		{
 			//Project_Collection projects = new Project_Collection();
-			//Project_Collection projects = Functions.LoadFromFile(@"C:\Users\chatziparadeisis.i\Documents\covid\athens.fol");
-			//projects.UploadData();
-			E3 newe3 = new E3();
-			newe3.FilePath = @"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΑΤΤΕ3-ΒΑΡΕ6-ΝΑΙΕ2\NAIE2-0159182\Ε3 2019__11520769.pdf";
-			newe3.ScanE3(newe3.FilePath);
-
-			F2 newF2 = new F2();
-			newF2.FilePath = @"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΑΤΤΕ3-ΒΑΡΕ6-ΝΑΙΕ2\ATTE3-0155268\Φ2_06.2020 Τροποποιητική Α__11598014.pdf";
-			//newF2.FilePath = @"\\FS\vol1\1. Προγραμματική Περίοδος 2014-2020\1. Ενίσχυση Πτυχιούχων\Docs\Φ2\ΔΗΛΩΣΗ Φ.Π.Α ΙΑΝΟΥΑΡΙΟΥ.pdf";
-			newF2.Scan();
-
-			//DebugFunctions.LocScan(@"\\FS\vol1\1. Προγραμματική Περίοδος 2014-2020\1. Ενίσχυση Πτυχιούχων\Docs\Φ2\ΔΗΛΩΣΗ Φ.Π.Α ΙΑΝΟΥΑΡΙΟΥ.pdf");
-		}
+			Project_Collection projects = Functions.LoadFromFile(@"C:\Users\chatziparadeisis.i\Documents\covid\athens.fol");
+			projects.UploadData(true);
+        }
     }
 }

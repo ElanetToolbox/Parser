@@ -88,6 +88,9 @@ namespace Parser_Console.Classes
 
             Taxis correctTaxisCompany = GetCorrectTaxis(Afm, newUpload);
 
+            F2_Info f2info2020 = GetCorrectF2(Afm, 2020, newUpload);
+            F2_Info f2info2019 = GetCorrectF2(Afm, 2019, newUpload);
+
             if (correctE3 != null && correctE3.Afm == Afm)
             {
                 newUpload.f102E32019 = correctE3.Values.Where(x => x.Key == "102").Single().Value.Value.ToString("N2").Replace(",", "");
@@ -152,6 +155,33 @@ namespace Parser_Console.Classes
                 }
             }
 
+            if(f2info2019 != null)
+            {
+                newUpload.Turnover2019A = f2info2019.WorkCycle.ToString("N2").Replace(",", "");
+                if(f2info2019.FilePaths.Count == 1)
+                {
+                    newUpload.Log += "Τα στοιχεία Φ2 2019 αντλήθηκαν από το αρχείο " + f2info2019.FilePaths.First() + "\n";
+                }
+                else
+                {
+                    newUpload.Log += "Τα στοιχεία Φ2 2019 αντλήθηκαν από τα αρχεία " + string.Join(",", f2info2019.FilePaths) + "\n";
+                }
+            }
+
+            if(f2info2020 != null)
+            {
+                newUpload.Turnover2020B = f2info2020.WorkCycle.ToString("N2").Replace(",", "");
+                if(f2info2020.FilePaths.Count == 1)
+                {
+                    newUpload.Log += "Τα στοιχεία Φ2 2020 αντλήθηκαν από το αρχείο " + f2info2020.FilePaths.First() + "\n";
+                }
+                else
+                {
+                    newUpload.Log += "Τα στοιχεία Φ2 2020 αντλήθηκαν από τα αρχεία " + string.Join(",", f2info2020.FilePaths) + "\n";
+                }
+            }
+
+
             return newUpload;
         }
 
@@ -215,6 +245,32 @@ namespace Parser_Console.Classes
             return correctE3;
         }
 
+        private F2_Info GetCorrectF2(string Afm, int year,Upload newUpload)
+        {
+            IEnumerable<F2> possibleF2s = Docs.F2s.Where(x => x.Year == year);
+            if(possibleF2s.Count() == 0)
+            {
+                newUpload.Log += "Δεν βρέθηκε αναγνώσιμος Φ2 για το φορολογικό έτος " + year + "\n";
+                return null;
+            }
+            possibleF2s = possibleF2s.Where(x => x.Afm == Afm);
+            if(possibleF2s.Count() == 0)
+            {
+                newUpload.Log += "Δεν βρέθηκε αναγνώσιμος Φ2 για το φορολογικό έτος " + year + " με το ΑΦΜ της εταιρίας" + "\n";
+                return null;
+            }
+            possibleF2s = possibleF2s.Where(x => !string.IsNullOrWhiteSpace(x.FormNumber));
+            if (possibleF2s.Count() == 0)
+            {
+                newUpload.Log += "Δεν βρέθηκε αναγνώσιμος Φ2 για το φορολογικό έτος " + year + " με το ΑΦΜ της εταιρίας και αριθμό υποβολής" + "\n";
+                return null;
+            }
+
+            F2_Info info = GetF2Info(year, possibleF2s);
+            newUpload.Log += info.Log + "\n";
+            return info;
+        }
+
         public void UploadProject()
         {
             if (!CanUpload || Uploaded)
@@ -227,6 +283,35 @@ namespace Parser_Console.Classes
             Uploaded = true;
         }
 
+        public F2_Info GetF2Info(int year, IEnumerable<F2> f2s)
+        {
+            F2_Info info = new F2_Info();
+            info.Year = year;
+            List<F2> correctF2s = new List<F2>();
+            if(f2s.Count() == 1)
+            {
+                var f2 = f2s.First();
+                if(f2.DateStart.Month == 4 && f2.DateEnd.Month == 6)
+                {
+                    correctF2s.Add(f2);
+                }
+                info.FilePaths.Add(f2.FileName);
+                info.WorkCycle = f2.WorkCycle;
+                return info;
+            }
+            if(f2s.Count() == 3)
+            {
+                f2s = f2s.OrderBy(x => x.DateStart);
+                if(f2s.First().DateStart.Month == 4 && f2s.Last().DateEnd.Month == 6)
+                {
+                    correctF2s.AddRange(f2s);
+                }
+                info.FilePaths = correctF2s.Select(x => x.FilePath).ToList();
+                info.WorkCycle = correctF2s.Sum(x => x.WorkCycle);
+                return info;
+            }
+            return null;
+        }
 
     }
 }

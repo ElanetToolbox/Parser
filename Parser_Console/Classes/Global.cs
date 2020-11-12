@@ -22,6 +22,7 @@ namespace Parser_Console.Classes
                 { "DateEnd",new Rectangle(200,842-115,55,15) },
                 { "DateSubmitted",new Rectangle(480,842-50,55,15) },
                 { "Afm",new Rectangle(430,842-218,65,15) },
+                { "FormNumber",new Rectangle(472,842-37,37,15) },
                 { "test",new Rectangle(90,842-115,55,15) },
             };
 

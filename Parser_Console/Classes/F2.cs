@@ -3,6 +3,7 @@ using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Filter;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
+using Newtonsoft.Json;
 using Parser_Console.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -15,13 +16,17 @@ namespace Parser_Console.Classes
     public class F2 : IDocument
     {
         public string FilePath { get; set; }
-        public string FileType { get; set; }
+		public string FileType => GetType().Name;
+        public string FileName => System.IO.Path.GetFileName(FilePath);
         public string Afm { get; set; }
+        public string FormNumber { get; set; }
         public DateTime DateSubmitted { get; set; }
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
         public decimal WorkCycle { get; set; }
+        [JsonIgnore]
         public Dictionary<string,Rectangle> Rectangles => Global.GetRectangles();
+        public int Year => DateStart.Year;
 
         public bool ParsingErrorExternal { get; set; }
 

@@ -81,7 +81,13 @@ namespace Parser_Console.Classes
 			DateTime start = DateTime.Now;
             if (serial)
             {
-                Projects.ForEach(x => x.UploadProject());
+                int i = 1;
+                foreach (var project in Projects)
+                {
+                    project.UploadProject();
+                    Console.WriteLine(i.ToString() + "-" + project.Code);
+                    i++;
+                }
             }
             else
             {
