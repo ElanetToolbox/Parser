@@ -30,8 +30,9 @@ namespace Parser_Console.Classes
         public bool HasWeirdE3 => E3s.Where(x => x.Year == 2019).Where(x => !x.Complete).Any();
 
         public bool FolderError { get; set; }
-        public bool NotPdf { get; set; }
+        public bool NotPdf { get; set; } 
 
+        public bool Removed { get; set; }
         public bool Uploaded { get; set; }
 
         public Project()
@@ -76,6 +77,14 @@ namespace Parser_Console.Classes
         public Upload CreateUpload()
         {
             ValidationInfo vInfo = Functions.GetAfmFromCode(Functions.Greekify(Code));
+            try
+            {
+                string afmtest = vInfo.Afm;
+            }
+            catch
+            {
+                Removed = true;
+            }
             string Afm = vInfo.Afm;
             List<string> DeclaredKads = vInfo.KadFormatted;
             List<Tuple<string, DateTime>> ValidKads = new List<Tuple<string, DateTime>>();
@@ -273,7 +282,7 @@ namespace Parser_Console.Classes
 
         public void UploadProject()
         {
-            if (!CanUpload || Uploaded)
+            if (!CanUpload || Uploaded || Removed)
             {
                 return;
             }
@@ -287,6 +296,7 @@ namespace Parser_Console.Classes
         {
             F2_Info info = new F2_Info();
             info.Year = year;
+            info.FilePaths = new List<string>();
             List<F2> correctF2s = new List<F2>();
             if(f2s.Count() == 1)
             {

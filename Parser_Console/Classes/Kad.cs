@@ -41,15 +41,6 @@ namespace Parser_Console.Classes
             Code = text.Substring(0, text.IndexOf(" ")).Trim();
             text = text.Replace(Code, "").Trim();
             var typePair = Functions.GetIndexFromList(text, Types);
-            //int tIndex = text.IndexOf("Κύρια");
-            //if(tIndex == -1)
-            //{
-            //    tIndex = text.IndexOf("∆ευτερεύουσα");
-            //    if(tIndex == -1)
-            //    {
-            //        tIndex = text.IndexOf("Λοιπή");
-            //    }
-            //}
             Description = text.Substring(0, typePair.Key).Trim();
             text = text.Replace(Description, "").Trim();
             Type = text.Substring(0, text.IndexOf(" ")).Trim();
@@ -67,15 +58,6 @@ namespace Parser_Console.Classes
             text = text.Replace(Code, "").Trim();
             var typePair = Functions.GetIndexFromList(text, Types);
             int tIndex = typePair.Key;
-            //int tIndex = text.IndexOf("Κύρια");
-            //if(tIndex == -1)
-            //{
-            //    tIndex = text.IndexOf("∆ευτερεύουσα");
-            //    if(tIndex == -1)
-            //    {
-            //        tIndex = text.IndexOf("Λοιπή");
-            //    }
-            //}
             Description = text.Substring(0, tIndex).Replace("\n"," ").Trim();
             text = text.Substring(tIndex);
             Type = text.Substring(0, text.IndexOf(" ")).Trim();

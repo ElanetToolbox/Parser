@@ -17,9 +17,12 @@ namespace Parser_Console
 	{
 		static void Main(string[] args)
 		{
-			//Project_Collection projects = new Project_Collection();
 			Project_Collection projects = Functions.LoadFromFile(@"C:\Users\chatziparadeisis.i\Documents\covid\athens.fol");
-			projects.UploadData(true);
+			//projects.Projects.ForEach(x => x.Uploaded = false);
+			int x = projects.Projects.Where(x => x.Uploaded).Count();
+			int y = projects.Projects.Where(x => x.CanUpload).Count();
+			int z = projects.Projects.Where(x => x.Removed).Count();
+			projects.UploadData();
         }
     }
 }
