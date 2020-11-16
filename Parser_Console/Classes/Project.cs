@@ -115,9 +115,9 @@ namespace Parser_Console.Classes
                 newUpload.Turnover2019 = correctE3.Values.Where(x => x.Key == "500").Single().Value.Value.ToString("N2").Replace(",", "");
                 newUpload.EBITDA2019 = correctE3.Values.Where(x => x.Key == "524").Single().Value.Value.ToString("N2").Replace(",", "");
                 newUpload.KadSuggestBiggest = new KadUpload();
-                newUpload.KadSuggestBiggest.KadEnumID = Functions.Kadify(correctE3.KadIncome);
+                newUpload.KadSuggestBiggest.a = Functions.Kadify(correctE3.KadIncome);
                 newUpload.KadSuggestMain = new KadUpload();
-                newUpload.KadSuggestMain.KadEnumID = Functions.Kadify(correctE3.KadMain);
+                newUpload.KadSuggestMain.a = Functions.Kadify(correctE3.KadMain);
             }
 
             if (correctTaxisCompany != null)
@@ -128,10 +128,10 @@ namespace Parser_Console.Classes
                 newUpload.PostCode = correctTaxisCompany.PostCode;
                 if (correctE3 != null)
                 {
-                    newUpload.KadSuggestBiggest.StartDate = correctTaxisCompany.Kads.Where(x => x.Code == correctE3.KadIncome && x.DateEnd == null).Single().DateStart.ToString("dd/MM/yyyy");
-                    newUpload.KadSuggestBiggest.PostCode = correctTaxisCompany.PostCode;
-                    newUpload.KadSuggestMain.StartDate = correctTaxisCompany.Kads.Where(x => x.Code == correctE3.KadMain && x.DateEnd == null).SingleOrDefault().DateStart.ToString("dd/MM/yyyy");
-                    newUpload.KadSuggestMain.PostCode = correctTaxisCompany.PostCode;
+                    newUpload.KadSuggestBiggest.b = correctTaxisCompany.Kads.Where(x => x.Code == correctE3.KadIncome && x.DateEnd == null).Single().DateStart.ToString("dd/MM/yyyy");
+                    newUpload.KadSuggestBiggest.c = correctTaxisCompany.PostCode;
+                    newUpload.KadSuggestMain.b = correctTaxisCompany.Kads.Where(x => x.Code == correctE3.KadMain && x.DateEnd == null).SingleOrDefault().DateStart.ToString("dd/MM/yyyy");
+                    newUpload.KadSuggestMain.c = correctTaxisCompany.PostCode;
                 }
 
                 if(correctTaxisCompany.Establishments == null)
@@ -149,9 +149,9 @@ namespace Parser_Console.Classes
                             foreach (var kad in est.Kads)
                             {
                                 KadUpload newKad = new KadUpload();
-                                newKad.KadEnumID = Functions.Kadify(kad.Code);
-                                newKad.StartDate = kad.DateStart.ToString("dd/MM/yyyy");
-                                newKad.PostCode = est.PostCode;
+                                newKad.a = Functions.Kadify(kad.Code);
+                                newKad.b = kad.DateStart.ToString("dd/MM/yyyy");
+                                newKad.c = est.PostCode;
                                 newUpload.KadImplementationPlaces.Add(newKad);
                             }
                         }

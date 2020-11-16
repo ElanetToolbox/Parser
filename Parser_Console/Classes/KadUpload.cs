@@ -6,8 +6,8 @@ namespace Parser_Console.Classes
 {
     public class KadUpload
     {
-        public string KadEnumID { get; set; }
-        public string StartDate { get; set; }
-        public string PostCode { get; set; }
+        public string a { get; set; }
+        public string b { get; set; }
+        public string c { get; set; }
     }
 }
