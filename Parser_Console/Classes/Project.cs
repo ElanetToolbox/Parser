@@ -35,6 +35,8 @@ namespace Parser_Console.Classes
         public bool Removed { get; set; }
         public bool Uploaded { get; set; }
 
+        public Upload Upload { get; set; }
+
         public Project()
         {
         }
@@ -277,6 +279,9 @@ namespace Parser_Console.Classes
 
             F2_Info info = GetF2Info(year, possibleF2s);
             newUpload.Log += info.Log + "\n";
+            //if (info != null)
+            //{
+            //}
             return info;
         }
 
@@ -286,9 +291,10 @@ namespace Parser_Console.Classes
             {
                 return;
             }
-            Upload newUpload = CreateUpload();
-            Functions.UploadStream(Functions.Greekify(Code), Encoding.UTF8.GetBytes(newUpload.Log), "report.txt");
-            newUpload.UploadToCloud(Functions.Greekify(Code));
+            //Upload newUpload = CreateUpload();
+            Upload = CreateUpload();
+            Functions.UploadStream(Functions.Greekify(Code), Encoding.UTF8.GetBytes(Upload.Log), "report.txt");
+            Upload.UploadToCloud(Functions.Greekify(Code));
             Uploaded = true;
         }
 
