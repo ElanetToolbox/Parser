@@ -17,16 +17,18 @@ namespace Parser_Console
 	{
 		static void Main(string[] args)
 		{
-            var docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\covid\athens.fol";
-            Project_Collection projects = Functions.LoadFromFile(docPath);
-            projects.Projects.ForEach(x => x.Uploaded = false);
+            Project_Collection p = new Project_Collection();
+            p.ScanPath(@"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΑΤΤΕ3-ΒΑΡΕ6-ΝΑΙΕ2");
+            //var docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\covid\athens.fol";
+            //Project_Collection projects = Functions.LoadFromFile(docPath);
+            //projects.Projects.ForEach(x => x.Uploaded = false);
             //var p = projects.Projects.Where(x => x.Code == "ATTE3-0155396").FirstOrDefault();
             //var s = p.Upload.ToJsonString();
 
             //int x = projects.Projects.Where(x => x.Uploaded).Count();
             //int y = projects.Projects.Where(x => x.CanUpload).Count();
             //int z = projects.Projects.Where(x => x.Removed).Count();
-            projects.UploadData();
+            //projects.UploadData();
         }
     }
 }

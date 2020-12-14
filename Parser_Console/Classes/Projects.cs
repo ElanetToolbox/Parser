@@ -71,9 +71,12 @@ namespace Parser_Console.Classes
 
         private void ScanFolder(string folder)
         {
-            Project newProject = new Project();
-            newProject.ScanPath(folder);
-            Projects.Add(newProject);
+            if (Directory.GetFiles(folder, "Κατάλογος Αρχείων.txt").Any())
+            {
+                Project newProject = new Project();
+                newProject.ScanPath(folder);
+                Projects.Add(newProject);
+            }
         }
 
         public void UploadData(bool serial = false)

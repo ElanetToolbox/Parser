@@ -293,7 +293,7 @@ namespace Parser_Console.Classes
             }
             //Upload newUpload = CreateUpload();
             Upload = CreateUpload();
-            Functions.UploadStream(Functions.Greekify(Code), Encoding.UTF8.GetBytes(Upload.Log), "report.txt");
+            Functions.UploadStream(Functions.Greekify(Code), Encoding.UTF8.GetBytes(Upload.Log), "Report.txt");
             Upload.UploadToCloud(Functions.Greekify(Code));
             Uploaded = true;
         }

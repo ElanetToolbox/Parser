@@ -256,7 +256,7 @@ namespace Parser_Console
         public static string CompressFolder(string path)
         {
             Directory.CreateDirectory(@"C:\Users\chatziparadeisis.i\Documents\covid\tmp\" + Path.GetFileName(path));
-            string zipFile = @"C:\Users\chatziparadeisis.i\Documents\covid\tmp\" + Path.GetFileName(path) + @"\documents.zip";
+            string zipFile = @"C:\Users\chatziparadeisis.i\Documents\covid\tmp\" + Path.GetFileName(path) + @"\Documents.zip";
             if (File.Exists(zipFile))
             {
                 File.Delete(zipFile);
