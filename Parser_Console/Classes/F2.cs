@@ -24,6 +24,7 @@ namespace Parser_Console.Classes
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
         public decimal WorkCycle { get; set; }
+        public decimal Outflow { get; set; }
         [JsonIgnore]
         public Dictionary<string,Rectangle> Rectangles => Global.GetRectangles();
         public int Year => DateStart.Year;
@@ -32,7 +33,8 @@ namespace Parser_Console.Classes
 
         public void Scan()
         {
-            WorkCycle = decimal.Parse(RectangleScan(Rectangles.Where(x => x.Key == "WorkCycle").Single().Value).Replace(".", ""),CultureInfo.GetCultureInfo("el-GR"));
+            GetWorkCycle();
+            GetOutflow();
             DateStart = DateTime.ParseExact(RectangleScan(Rectangles.Where(x => x.Key == "DateStart").Single().Value), @"dd/MM/yy", CultureInfo.InvariantCulture);
             DateEnd = DateTime.ParseExact(RectangleScan(Rectangles.Where(x => x.Key == "DateEnd").Single().Value), @"dd/MM/yy", CultureInfo.InvariantCulture);
             DateSubmitted = DateTime.ParseExact(RectangleScan(Rectangles.Where(x => x.Key == "DateSubmitted").Single().Value), @"dd/MM/yy", CultureInfo.InvariantCulture);
@@ -40,9 +42,29 @@ namespace Parser_Console.Classes
             FormNumber = RectangleScan(Rectangles.Where(x=>x.Key == "FormNumber").Single().Value);
         }
 
-        public void Test()
+        public void GetOutflow()
         {
-            RectangleScan(Rectangles.Where(x => x.Key == "test").Single().Value);
+            try
+            {
+                Outflow = decimal.Parse(RectangleScan(Rectangles.Where(x => x.Key == "Outflow").Single().Value).Replace(".", ""), CultureInfo.GetCultureInfo("el-GR"));
+            }
+            catch
+            {
+                Outflow = 0;
+            }
+        }
+
+        public void GetWorkCycle()
+        {
+            try
+            {
+                WorkCycle = decimal.Parse(RectangleScan(Rectangles.Where(x => x.Key == "WorkCycle").Single().Value).Replace(".", ""), CultureInfo.GetCultureInfo("el-GR"));
+            }
+            catch
+            {
+                WorkCycle = 0;
+            }
+
         }
 
         public string RectangleScan(Rectangle rect)

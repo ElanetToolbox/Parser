@@ -40,7 +40,9 @@ namespace Parser_Console.Classes
 
         //f2
         public string Turnover2019A { get; set; }
+        public string Turnover2019A_311 { get; set; }
         public string Turnover2020B { get; set; }
+        public string Turnover2020B_311 { get; set; }
 
         public string Log { get; set; }
 
@@ -63,7 +65,7 @@ namespace Parser_Console.Classes
             string json = ToJsonString();
             request.AddParameter("application/json", json, ParameterType.RequestBody);
             IRestResponse response = client.Execute(request);
-            if(response.StatusCode != System.Net.HttpStatusCode.OK)
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 throw new Exception();
             }

@@ -1,4 +1,5 @@
-﻿using iText.Kernel.Pdf;
+﻿using IronXL;
+using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using Microsoft.VisualBasic;
@@ -17,18 +18,39 @@ namespace Parser_Console
 	{
 		static void Main(string[] args)
 		{
-            Project_Collection p = new Project_Collection();
-            p.ScanPath(@"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΑΤΤΕ3-ΒΑΡΕ6-ΝΑΙΕ2");
-            //var docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\covid\athens.fol";
-            //Project_Collection projects = Functions.LoadFromFile(docPath);
-            //projects.Projects.ForEach(x => x.Uploaded = false);
-            //var p = projects.Projects.Where(x => x.Code == "ATTE3-0155396").FirstOrDefault();
-            //var s = p.Upload.ToJsonString();
+			var folders = Directory.GetDirectories(@"T:\ToolboxStorage\Υλοποίηση\Προγράμματα\ΑΤΤΕ3-ΒΑΡΕ6-ΝΑΙΕ2\EPIPLEON_NAIE2").ToList();
 
-            //int x = projects.Projects.Where(x => x.Uploaded).Count();
-            //int y = projects.Projects.Where(x => x.CanUpload).Count();
-            //int z = projects.Projects.Where(x => x.Removed).Count();
-            //projects.UploadData();
+            var docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\covid\athens.fol";
+            Project_Collection projects = Functions.LoadFromFile(docPath);
+
+            var nProj = projects.Projects.Where(x => x.Code.Contains("NAIE")).ToList();
+			var proj = nProj.Where(x => x.F2s.Where(y => y.Outflow != 0).Any()).ToList();
+			foreach (var item in proj)
+			{
+				item.UploadProject();
+			}
+			var f2s = nProj.SelectMany(x=>x.F2s).ToList();
+			int i = 0;
+			foreach (var f in f2s)
+			{
+				i++;
+				f.GetOutflow();
+				Console.WriteLine(i);
+			}
+
+   //         int i = 0;
+   //         foreach (var p in nProj)
+			//{
+			//	i++;
+			//	try
+			//	{
+			//		p.UploadProject();
+			//	}
+			//	catch { }
+			//	Console.WriteLine(i.ToString());
+			//}
+
+            Functions.SaveToFile(projects, docPath);
         }
     }
 }

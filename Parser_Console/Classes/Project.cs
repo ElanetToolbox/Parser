@@ -120,6 +120,34 @@ namespace Parser_Console.Classes
                 newUpload.KadSuggestMain.a = Functions.Kadify(correctE3.KadMain);
             }
 
+            if(f2info2019 != null)
+            {
+                newUpload.Turnover2019A = f2info2019.WorkCycle.ToString("N2").Replace(",", "");
+                newUpload.Turnover2019A_311 = f2info2019.Outflow.ToString("N2").Replace(",", "");
+                if(f2info2019.FilePaths.Count == 1)
+                {
+                    newUpload.Log += "Τα στοιχεία Φ2 2019 αντλήθηκαν από το αρχείο " + f2info2019.FilePaths.First() + "\n";
+                }
+                else
+                {
+                    newUpload.Log += "Τα στοιχεία Φ2 2019 αντλήθηκαν από τα αρχεία " + string.Join(",", f2info2019.FilePaths) + "\n";
+                }
+            }
+
+            if(f2info2020 != null)
+            {
+                newUpload.Turnover2020B = f2info2020.WorkCycle.ToString("N2").Replace(",", "");
+                newUpload.Turnover2020B_311 = f2info2020.Outflow.ToString("N2").Replace(",", "");
+                if(f2info2020.FilePaths.Count == 1)
+                {
+                    newUpload.Log += "Τα στοιχεία Φ2 2020 αντλήθηκαν από το αρχείο " + f2info2020.FilePaths.First() + "\n";
+                }
+                else
+                {
+                    newUpload.Log += "Τα στοιχεία Φ2 2020 αντλήθηκαν από τα αρχεία " + string.Join(",", f2info2020.FilePaths) + "\n";
+                }
+            }
+
             if (correctTaxisCompany != null)
             {
                 newUpload.TaxCode = correctTaxisCompany.Afm;
@@ -165,34 +193,6 @@ namespace Parser_Console.Classes
                     }
                 }
             }
-
-            if(f2info2019 != null)
-            {
-                newUpload.Turnover2019A = f2info2019.WorkCycle.ToString("N2").Replace(",", "");
-                if(f2info2019.FilePaths.Count == 1)
-                {
-                    newUpload.Log += "Τα στοιχεία Φ2 2019 αντλήθηκαν από το αρχείο " + f2info2019.FilePaths.First() + "\n";
-                }
-                else
-                {
-                    newUpload.Log += "Τα στοιχεία Φ2 2019 αντλήθηκαν από τα αρχεία " + string.Join(",", f2info2019.FilePaths) + "\n";
-                }
-            }
-
-            if(f2info2020 != null)
-            {
-                newUpload.Turnover2020B = f2info2020.WorkCycle.ToString("N2").Replace(",", "");
-                if(f2info2020.FilePaths.Count == 1)
-                {
-                    newUpload.Log += "Τα στοιχεία Φ2 2020 αντλήθηκαν από το αρχείο " + f2info2020.FilePaths.First() + "\n";
-                }
-                else
-                {
-                    newUpload.Log += "Τα στοιχεία Φ2 2020 αντλήθηκαν από τα αρχεία " + string.Join(",", f2info2020.FilePaths) + "\n";
-                }
-            }
-
-
             return newUpload;
         }
 
@@ -278,19 +278,20 @@ namespace Parser_Console.Classes
             }
 
             F2_Info info = GetF2Info(year, possibleF2s);
-            newUpload.Log += info.Log + "\n";
-            //if (info != null)
-            //{
-            //}
+            try
+            {
+                newUpload.Log += info.Log + "\n";
+            }
+            catch { }
             return info;
         }
 
         public void UploadProject()
         {
-            if (!CanUpload || Uploaded || Removed)
-            {
-                return;
-            }
+            //if (!CanUpload || Uploaded || Removed)
+            //{
+            //    return;
+            //}
             //Upload newUpload = CreateUpload();
             Upload = CreateUpload();
             Functions.UploadStream(Functions.Greekify(Code), Encoding.UTF8.GetBytes(Upload.Log), "Report.txt");
@@ -313,6 +314,7 @@ namespace Parser_Console.Classes
                 }
                 info.FilePaths.Add(f2.FileName);
                 info.WorkCycle = f2.WorkCycle;
+                info.Outflow = f2.Outflow;
                 return info;
             }
             if(f2s.Count() == 3)
@@ -324,6 +326,7 @@ namespace Parser_Console.Classes
                 }
                 info.FilePaths = correctF2s.Select(x => x.FilePath).ToList();
                 info.WorkCycle = correctF2s.Sum(x => x.WorkCycle);
+                info.Outflow = correctF2s.Sum(x => x.Outflow);
                 return info;
             }
             return null;

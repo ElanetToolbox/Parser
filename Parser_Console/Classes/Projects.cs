@@ -36,11 +36,22 @@ namespace Parser_Console.Classes
             Projects = new List<Project>();
         }
         
-        public void ScanPath(string path,bool serial = false)
+        public void ScanPath(string path,List<string> exclude = null,bool serial = false)
         {
 			var folders = Directory.GetDirectories(path).ToList();
             IEnumerable<string> existing = Projects.Select(x => x.ProjectPath);
             folders = folders.Except(existing).ToList();
+            if(exclude != null)
+            {
+                foreach (var e in exclude)
+                {
+                    var p = folders.Where(x => x.Contains(e)).SingleOrDefault();
+                    if(p != null)
+                    {
+                        folders.Remove(p);
+                    }
+                }
+            }
 			DateTime start = DateTime.Now;
 
             if (serial)
@@ -57,7 +68,11 @@ namespace Parser_Console.Classes
             {
                 Parallel.ForEach(folders, folder =>
                 {
-                    ScanFolder(folder);
+                    try
+                    {
+                        ScanFolder(folder);
+                    }
+                    catch { }
                 });
             }
 

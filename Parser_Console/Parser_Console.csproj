@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="IronXL.Excel" Version="2020.12.2" />
     <PackageReference Include="itext7" Version="7.1.12" />
     <PackageReference Include="Microsoft.PowerShell.5.ReferenceAssemblies" Version="1.1.0" />
     <PackageReference Include="Newtonsoft.Json.Bson" Version="1.0.2" />

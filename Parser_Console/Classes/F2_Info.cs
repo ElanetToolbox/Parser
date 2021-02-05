@@ -9,6 +9,7 @@ namespace Parser_Console.Classes
         public int Year { get; set; }
         public List<string> FilePaths { get; set; }
         public decimal WorkCycle { get; set; }
+        public decimal Outflow { get; set; }
         public string Log { get; set; }
     }
 }
